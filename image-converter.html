@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Converter Tool</title>
+  <style>
+    /* Futuristic Background */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0d47a1, #42a5f5);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      width: 95%;
+      max-width: 450px;
+      box-shadow: 0 0 25px rgba(0, 200, 255, 0.7);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      animation: glow 4s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 15px #00c3ff; }
+      to   { box-shadow: 0 0 30px #42a5f5; }
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+
+    input[type="file"], select, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+    }
+
+    input[type="file"] {
+      background: #ffffff;
+      color: #0d47a1;
+      cursor: pointer;
+    }
+
+    select {
+      background: #ffffff;
+      color: #0d47a1;
+      font-weight: bold;
+    }
+
+    button {
+      background: #00c3ff;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #0288d1;
+      transform: scale(1.05);
+    }
+
+    .preview {
+      margin-top: 15px;
+    }
+
+    .preview img {
+      max-width: 100%;
+      border-radius: 15px;
+      border: 2px solid #fff;
+      margin-top: 10px;
+    }
+
+    @media(max-width: 500px) {
+      h1 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔵 Image Converter</h1>
+    <input type="file" id="upload" accept="image/*">
+    
+    <select id="format">
+      <option value="image/jpeg">Convert to JPG</option>
+      <option value="image/png">Convert to PNG</option>
+      <option value="image/webp">Convert to WebP</option>
+    </select>
+    
+    <button onclick="convertImage()">Convert & Download</button>
+    
+    <div class="preview" id="preview"></div>
+  </div>
+
+  <script>
+    let uploadedImage = null;
+
+    document.getElementById('upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          uploadedImage = new Image();
+          uploadedImage.src = event.target.result;
+          uploadedImage.onload = function() {
+            document.getElementById('preview').innerHTML =
+              '<p>Preview:</p><img src="'+ uploadedImage.src +'" alt="Preview">';
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function convertImage() {
+      if (!uploadedImage) {
+        alert("Please upload an image first!");
+        return;
+      }
+
+      const format = document.getElementById("format").value;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = uploadedImage.width;
+      canvas.height = uploadedImage.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(uploadedImage, 0, 0);
+
+      canvas.toBlob(function(blob) {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+
+        // Set file extension
+        if (format === "image/jpeg") link.download = "converted.jpg";
+        else if (format === "image/png") link.download = "converted.png";
+        else if (format === "image/webp") link.download = "converted.webp";
+
+        link.click();
+      }, format, 0.9); // 0.9 = compression quality
+    }
+  </script>
+</body>
+</html>
