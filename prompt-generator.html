@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prompt Generator — KathaByte Tools</title>
+  <style>
+    :root{
+      --bg1:#eaf6ff;
+      --blue-deep:#0d47a1;
+      --blue-mid:#0077d6;
+      --accent:#00c3ff;
+      --glass:rgba(255,255,255,0.08);
+      --card-radius:14px;
+      --max-w:1000px;
+      --text-dark:#042a4a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(0,195,255,0.06), transparent),
+                  linear-gradient(135deg,#e6f4ff 0%, #ffffff 60%);
+      color:var(--text-dark);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:var(--max-w);
+      display:grid;
+      grid-template-columns: 1fr 340px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.86));
+      border-radius:var(--card-radius);
+      padding:18px;
+      box-shadow:0 10px 30px rgba(3,54,120,0.08);
+      border:1px solid rgba(13,71,161,0.06);
+    }
+
+    header.card{
+      grid-column:1/-1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    h1{margin:0;font-size:18px;color:var(--blue-deep);display:flex;align-items:center;gap:10px}
+    p.lead{margin:6px 0 0;color:#0b4b72;font-size:13px}
+
+    .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .controls .full{grid-column:1/-1}
+    label{display:block;font-size:13px;color:#0b4b72;margin-bottom:6px}
+    select,input[type="number"],textarea{
+      width:100%;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid rgba(13,71,161,0.06);
+      font-size:14px;
+      outline:none;
+      background:#fff;
+      color:var(--text-dark);
+    }
+
+    textarea{min-height:180px; resize:vertical; padding:12px; }
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{
+      padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600;
+    }
+    .primary{background:linear-gradient(90deg,var(--accent),var(--blue-mid));color:#fff;box-shadow:0 6px 18px rgba(0,195,255,0.08)}
+    .muted{background:#fff;color:var(--blue-mid);border:1px solid rgba(13,71,161,0.06)}
+    .ghost{background:transparent;color:var(--blue-mid);border:1px dashed rgba(13,71,161,0.06)}
+
+    .right-col{display:flex;flex-direction:column;gap:12px}
+    .preview{background:linear-gradient(180deg,rgba(13,71,161,0.03),rgba(13,71,161,0.015));padding:12px;border-radius:10px;min-height:160px}
+    .prompt-item{background:#fff;padding:10px;border-radius:8px;color:var(--text-dark);margin-bottom:8px;border:1px solid rgba(13,71,161,0.04)}
+    .small{font-size:12px;color:#0b4b72}
+
+    .favorites{max-height:260px;overflow:auto;padding:8px;border-radius:8px;background:#fff;border:1px solid rgba(13,71,161,0.04)}
+
+    .ad-slot{margin:12px 0;text-align:center}
+
+    footer{grid-column:1/-1;margin-top:8px;font-size:12px;color:#0b4b72;text-align:center}
+
+    @media(max-width:1000px){
+      .wrap{grid-template-columns:1fr}
+      .right-col{order:-1}
+    }
+    @media(max-width:420px){
+      h1{font-size:16px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Header + top banner ad -->
+    <header class="card">
+      <div>
+        <h1>🧠 Prompt Generator</h1>
+        <p class="lead">Create high-quality prompts for AI — image, story, marketing, code, and more. Copy, download, or save favorites.</p>
+      </div>
+
+      <div style="min-width:200px;text-align:right;">
+        <!-- Top Banner Ad (728x90 / 320x50 fallback) -->
+        <div class="ad-slot" aria-hidden>
+          <script type="text/javascript">
+            atOptions = {
+              'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+              'format' : 'iframe',
+              'height' : 90,
+              'width' : 728,
+              'params' : {}
+            };
+          </script>
+          <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main controls -->
+    <section class="card">
+      <div class="controls">
+        <div>
+          <label for="category">Category</label>
+          <select id="category">
+            <option value="image">AI Image Prompt</option>
+            <option value="story">Short Story / Fiction</option>
+            <option value="youtube">YouTube Video Script</option>
+            <option value="marketing">Marketing Copy / Ad</option>
+            <option value="code">Code Snippet / Debug</option>
+            <option value="blog">Blog Article Outline</option>
+            <option value="product">Product Description</option>
+            <option value="social">Social Media Caption</option>
+            <option value="other">Custom / Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="language">Language</label>
+          <select id="language">
+            <option value="English">English</option>
+            <option value="हिन्दी">हिन्दी</option>
+            <option value="Bilingual">Bilingual (EN+HI)</option>
+            <option value="Spanish">Spanish</option>
+            <option value="French">French</option>
+            <option value="Custom">Custom</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="tone">Tone / Style</label>
+          <select id="tone">
+            <option>Neutral / Informative</option>
+            <option>Friendly / Casual</option>
+            <option>Professional</option>
+            <option>Persuasive</option>
+            <option>Funny / Witty</option>
+            <option>Dark / Cinematic</option>
+            <option>Descriptive / Vivid</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="length">Length / Depth</label>
+          <select id="length">
+            <option value="short">Short (1-2 lines)</option>
+            <option value="medium" selected>Medium (1 paragraph)</option>
+            <option value="long">Long (detailed)</option>
+          </select>
+        </div>
+
+        <div class="full">
+          <label for="context">Context / Keywords (comma separated)</label>
+          <input id="context" placeholder="e.g., haunted mansion, eerie lighting, wide-angle, Hindi folklore" />
+        </div>
+
+        <div>
+          <label for="variations">Variations</label>
+          <input id="variations" type="number" min="1" max="6" value="3" />
+        </div>
+
+        <div>
+          <label>&nbsp;</label>
+          <div style="display:flex;gap:8px;">
+            <button class="primary" id="generateBtn">Generate Prompts</button>
+            <button class="muted" id="clearBtn">Clear Output</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label for="manual">Manual prompt tweak (optional)</label>
+        <textarea id="manual" placeholder="Write or edit the prompt before saving / downloading..."></textarea>
+
+        <div class="actions">
+          <button class="primary" id="saveFav">⭐ Save Favorite</button>
+          <button class="ghost" id="copyBtn">Copy to Clipboard</button>
+          <button class="muted" id="downloadBtn">Download .txt</button>
+          <button class="ghost" id="useManualBtn">Use Manual (replace outputs)</button>
+        </div>
+      </div>
+
+      <!-- Middle ad (300x250) -->
+      <div class="ad-slot" aria-hidden>
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+      </div>
+    </section>
+
+    <!-- Right column: preview + favorites + small ad -->
+    <aside class="card right-col">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong style="color:var(--blue-deep)">Preview</strong>
+          <span class="small">Variations will appear below</span>
+        </div>
+        <div class="preview" id="outputArea">
+          <div class="small" style="opacity:.8">No prompts yet — click <strong>Generate Prompts</strong>.</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong style="color:var(--blue-deep)">Favorites</strong>
+          <small class="small">Saved locally</small>
+        </div>
+        <div class="favorites" id="favorites"></div>
+      </div>
+
+      <!-- Side ad (160x300) -->
+      <div class="ad-slot" aria-hidden>
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '962ff242b01ed125eb9b14423f7dbd3f',
+            'format' : 'iframe',
+            'height' : 300,
+            'width' : 160,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js"></script>
+      </div>
+    </aside>
+
+    <!-- Bottom banner ad -->
+    <div class="card" style="text-align:center">
+      <div class="ad-slot" aria-hidden>
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '496188380e746eef901d9058c8f77c85',
+            'format' : 'iframe',
+            'height' : 60,
+            'width' : 468,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+      </div>
+    </div>
+
+    <footer class="card">
+      Tip: Use clear keywords like "style, mood, camera, color, era" for image prompts. Save favorites you use often.
+    </footer>
+  </div>
+
+  <script>
+    // --- Prompt templates per category ---
+    const TEMPLATES = {
+      image: [
+        (ctx, tone, lang, len) => `Create a highly detailed ${lang} image prompt of ${ctx}. Emphasize lighting, mood, color palette, and camera settings. Use short descriptive phrases, separated by commas. Tone: ${tone}.`,
+        (ctx, tone, lang) => `Ultra-detailed ${lang} scene: ${ctx}. Include focal point, background elements, style references, and desired aspect ratio. Tone: ${tone}.`,
+        (ctx, tone, lang) => `Render ${ctx} as a ${tone} ${lang} concept art; include textures, atmosphere, and composition instructions.`
+      ],
+      story: [
+        (ctx, tone, lang, len) => `Write a ${len} ${lang} ${tone} ${ctx} story hook with vivid sensory details and a cliffhanger at the end.`,
+        (ctx, tone, lang) => `Create a ${lang} short scene based on ${ctx}, focusing on character emotion, setting, and a surprising twist. Tone: ${tone}.`,
+        (ctx, tone, lang) => `Develop a ${lang} opening paragraph for a short story about ${ctx}, evoking strong imagery and curiosity.`
+      ],
+      youtube: [
+        (ctx, tone, lang) => `Create a ${lang} 90-second YouTube hook + 5 bullet outline for a video about ${ctx}. Tone: ${tone}. Include call-to-action.`,
+        (ctx, tone, lang) => `Write a ${lang} video script intro (30-45s) for topic ${ctx}, with engaging questions and energy. Tone: ${tone}.`
+      ],
+      marketing: [
+        (ctx, tone, lang) => `Write a ${lang} ad copy for ${ctx} (headline + 2 short descriptions) focused on benefits and urgency. Tone: ${tone}.`,
+        (ctx, tone, lang) => `Create 3 social media ad captions in ${lang} for ${ctx}, each under 150 characters, with strong CTA.`
+      ],
+      code: [
+        (ctx, tone, lang) => `Produce a ${lang} programming prompt: "Implement ${ctx} with clear input/output examples and edge cases."`,
+        (ctx, tone, lang) => `Generate a ${lang} debugging prompt: "Explain why ${ctx} might fail and how to fix it, with suggestions."`
+      ],
+      blog: [
+        (ctx, tone, lang) => `Generate a ${lang} detailed blog outline for an article about ${ctx}, with H2/H3 headings and 150-word intro. Tone: ${tone}.`,
+        (ctx, tone, lang) => `Create 5 engaging blog titles in ${lang} for ${ctx} and a meta description.`
+      ],
+      product: [
+        (ctx, tone, lang) => `Write a ${lang} product description for ${ctx} — features, benefits, and 3 bullet highlights. Tone: ${tone}.`,
+        (ctx, tone, lang) => `Create a ${lang} short tagline and 2 social captions for ${ctx}.`
+      ],
+      social: [
+        (ctx, tone, lang) => `Write 5 social media captions (short) in ${lang} for ${ctx}, each with a different hook and emoji.`,
+        (ctx, tone, lang) => `Generate an engaging tweet/thread starter in ${lang} about ${ctx}. Tone: ${tone}.`
+      ],
+      other: [
+        (ctx, tone, lang) => `Create a ${lang} creative prompt for ${ctx}. Tone: ${tone}. Make it clear and actionable.`,
+        (ctx, tone, lang) => `Provide a ${lang} multi-step task prompt for ${ctx}, including requirements and expected output.`
+      ]
+    };
+
+    // UI elements
+    const categoryEl = document.getElementById('category');
+    const languageEl = document.getElementById('language');
+    const toneEl = document.getElementById('tone');
+    const lengthEl = document.getElementById('length');
+    const contextEl = document.getElementById('context');
+    const variationsEl = document.getElementById('variations');
+    const generateBtn = document.getElementById('generateBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const outputArea = document.getElementById('outputArea');
+    const manualEl = document.getElementById('manual');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const saveFav = document.getElementById('saveFav');
+    const favoritesEl = document.getElementById('favorites');
+    const useManualBtn = document.getElementById('useManualBtn');
+
+    // Load favorites from localStorage
+    let favorites = JSON.parse(localStorage.getItem('prompt_favs') || '[]');
+    renderFavorites();
+
+    function renderFavorites(){
+      favoritesEl.innerHTML = '';
+      if(!favorites.length){ favoritesEl.innerHTML = '<div class="small" style="opacity:.8">No favorites yet.</div>'; return; }
+      favorites.slice().reverse().forEach((t,i)=>{
+        const wrap = document.createElement('div');
+        wrap.className = 'prompt-item';
+        wrap.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
+          <div style="flex:1"><div style="font-size:13px;color:#0b4b72">${escapeHtml(t)}</div></div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-left:8px">
+            <button class="ghost" data-idx="${i}" title="Use">Use</button>
+            <button class="muted" data-del="${i}" title="Delete">Del</button>
+          </div>
+        </div>`;
+        favoritesEl.appendChild(wrap);
+      });
+      // attach handlers
+      favoritesEl.querySelectorAll('[data-idx]').forEach(b=>b.addEventListener('click',e=>{
+        const idx = +e.currentTarget.getAttribute('data-idx');
+        manualEl.value = favorites[idx];
+      }));
+      favoritesEl.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',e=>{
+        const idx = +e.currentTarget.getAttribute('data-del');
+        favorites.splice(idx,1);
+        localStorage.setItem('prompt_favs', JSON.stringify(favorites));
+        renderFavorites();
+      }));
+    }
+
+    function escapeHtml(str){ return String(str).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // Generate logic
+    generateBtn.addEventListener('click', ()=>{
+      const cat = categoryEl.value;
+      const lang = languageEl.value;
+      const tone = toneEl.value;
+      const len = lengthEl.value;
+      const ctx = (contextEl.value || '').trim() || '—';
+      let n = parseInt(variationsEl.value) || 1;
+      n = Math.max(1, Math.min(6, n));
+      const templates = TEMPLATES[cat] || TEMPLATES.other;
+      const outputs = [];
+
+      for(let i=0;i<n;i++){
+        // pick a template (cycle or random)
+        const template = templates[i % templates.length];
+        const prompt = typeof template === 'function'
+          ? template(ctx, tone, lang, len)
+          : template.replace('{ctx}', ctx).replace('{tone}', tone).replace('{lang}', lang);
+        // apply light randomization for variety
+        const final = diversifyPrompt(prompt, cat, i);
+        outputs.push(final);
+      }
+      showOutputs(outputs);
+    });
+
+    clearBtn.addEventListener('click', ()=>{
+      outputArea.innerHTML = '<div class="small" style="opacity:.8">Cleared.</div>';
+    });
+
+    // Show outputs in preview area
+    function showOutputs(list){
+      outputArea.innerHTML = '';
+      list.forEach((txt, idx) => {
+        const el = document.createElement('div');
+        el.className = 'prompt-item';
+        el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:start">
+          <div style="flex:1"><strong style="font-size:13px;color:#0b4b72">Prompt ${idx+1}</strong>
+            <div style="margin-top:8px">${escapeHtml(txt).replace(/\n/g,'<br>')}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-left:10px">
+            <button class="ghost" data-copy="${idx}">Copy</button>
+            <button class="muted" data-save="${idx}">Save</button>
+          </div>
+        </div>`;
+        outputArea.appendChild(el);
+      });
+
+      // attach small button handlers
+      outputArea.querySelectorAll('[data-copy]').forEach(btn=>{
+        btn.addEventListener('click', e=>{
+          const i = +e.currentTarget.getAttribute('data-copy');
+          const text = list[i];
+          navigator.clipboard.writeText(text).then(()=>alert('Copied to clipboard'));
+        });
+      });
+
+      outputArea.querySelectorAll('[data-save]').forEach(btn=>{
+        btn.addEventListener('click', e=>{
+          const i = +e.currentTarget.getAttribute('data-save');
+          favorites.push(list[i]);
+          localStorage.setItem('prompt_favs', JSON.stringify(favorites));
+          renderFavorites();
+        });
+      });
+
+      // Put first output into manual textarea for editing
+      if(list.length) manualEl.value = list[0];
+    }
+
+    // diversify helper (adds small variations)
+    function diversifyPrompt(base, category, idx){
+      const variants = [
+        '', 'Use cinematic lighting', 'High detail', 'Minimalist', 'Include negative space', 'Use dramatic contrast'
+      ];
+      const suffix = variants[(Date.now() + idx) % variants.length];
+      return suffix ? `${base} — ${suffix}` : base;
+    }
+
+    // Copy & download & save favorite buttons
+    copyBtn.addEventListener('click', ()=>{
+      const t = manualEl.value.trim();
+      if(!t){ alert('No prompt to copy'); return; }
+      navigator.clipboard.writeText(t).then(()=>alert('Manual prompt copied'));
+    });
+
+    downloadBtn.addEventListener('click', ()=>{
+      const text = manualEl.value.trim();
+      if(!text){ alert('No prompt to download'); return; }
+      const blob = new Blob([text], {type:'text/plain'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'prompt.txt';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    saveFav.addEventListener('click', ()=>{
+      const t = manualEl.value.trim();
+      if(!t){ alert('Nothing to save'); return; }
+      favorites.push(t);
+      localStorage.setItem('prompt_favs', JSON.stringify(favorites));
+      renderFavorites();
+      alert('Saved to favorites');
+    });
+
+    useManualBtn.addEventListener('click', ()=>{
+      const t = manualEl.value.trim();
+      if(!t){ alert('Manual is empty'); return; }
+      showOutputs([t]);
+    });
+
+    // Helper: initial sample
+    (function seedExample(){
+      const example = `A mist-shrouded ancient temple at dawn, overgrown vines, warm volumetric rays, ultra-detailed, dramatic wide-angle — cinematic`;
+      contextEl.value = example;
+    })();
+
+    // Responsive small fallback ad: 320x50 insert at the end for mobile
+    (function insertMobileAd(){
+      // Do nothing; ad scripts already added in slots (providers commonly detect device)
+      // For strict mobile-only, you could inject 320x50 script here if required.
+    })();
+
+    // Prevent XSS when rendering favorites (already escaped) — done above.
+
+  </script>
+</body>
+</html>
