@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calorie Counter Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    header {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    label, select, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      font-size: 1rem;
+    }
+
+    select, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    button {
+      background: #42a5f5;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #1e88e5;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    /* Ads */
+    .ad-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🔥 Calorie Counter Tool</h1>
+  </header>
+
+  <!-- Top Banner Ad (728x90 / 468x60 for desktop, 320x50 for mobile) -->
+  <div class="ad-container">
+    <!-- 728x90 -->
+    <script type="text/javascript">
+      atOptions = {
+        'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+  </div>
+
+  <div class="container">
+    <label for="food">Select a Food Item:</label>
+    <select id="food">
+      <option value="0">--Choose Food--</option>
+      <option value="95">🍎 Apple (95 cal)</option>
+      <option value="105">🍌 Banana (105 cal)</option>
+      <option value="150">🥔 Boiled Potato (150 cal)</option>
+      <option value="250">🍕 Slice of Pizza (250 cal)</option>
+      <option value="300">🍔 Burger (300 cal)</option>
+      <option value="200">🥛 Glass of Milk (200 cal)</option>
+      <option value="350">🍗 Fried Chicken (350 cal)</option>
+    </select>
+
+    <button onclick="addCalories()">Add to List</button>
+
+    <div class="result" id="result">Total Calories: 0</div>
+  </div>
+
+  <!-- Middle Ad (300x250 / 320x50 for mobile) -->
+  <div class="ad-container">
+    <!-- 300x250 -->
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+  </div>
+
+  <!-- Side Ad (160x300) -->
+  <div class="ad-container">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '962ff242b01ed125eb9b14423f7dbd3f',
+        'format' : 'iframe',
+        'height' : 300,
+        'width' : 160,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js"></script>
+  </div>
+
+  <!-- Bottom Banner (468x60 / 320x50 for mobile) -->
+  <div class="ad-container">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '496188380e746eef901d9058c8f77c85',
+        'format' : 'iframe',
+        'height' : 60,
+        'width' : 468,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+  </div>
+
+  <script>
+    let totalCalories = 0;
+
+    function addCalories() {
+      let food = document.getElementById("food");
+      let calories = parseInt(food.value);
+
+      if (calories > 0) {
+        totalCalories += calories;
+        document.getElementById("result").innerText = "Total Calories: " + totalCalories;
+      } else {
+        alert("Please select a food item!");
+      }
+    }
+  </script>
+
+</body>
+</html>
