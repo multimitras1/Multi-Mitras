@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Video ➜ MP3 Converter</title>
+  <!-- LameJS for MP3 encoding -->
+  <script src="https://unpkg.com/lamejs@1.2.0/lame.min.js"></script>
+  <style>
+    /* --------- Futuristic Blue + White Theme --------- */
+    :root{
+      --bg1: #eaf6ff;
+      --blue-deep: #0d47a1;
+      --blue-mid: #0077d6;
+      --accent: #00c3ff;
+      --glass: rgba(255,255,255,0.08);
+      --glass-2: rgba(255,255,255,0.12);
+      --text-dark: #042a4a;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(0,195,255,0.08), transparent),
+                  linear-gradient(135deg,#e6f4ff 0%, #ffffff 55%);
+      color: var(--text-dark);
+      -webkit-font-smoothing:antialiased;
+    }
+
+    .wrap {
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      box-sizing:border-box;
+    }
+
+    .card {
+      width:100%;
+      max-width:880px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.80));
+      border-radius:18px;
+      padding:18px;
+      box-shadow: 0 8px 30px rgba(3, 54, 120, 0.12), 0 2px 6px rgba(0,0,0,0.05);
+      border: 1px solid rgba(13,71,161,0.06);
+      backdrop-filter: blur(8px) saturate(120%);
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:18px;
+    }
+
+    /* Left (controls) */
+    .left {
+      padding:12px;
+    }
+
+    h1 {
+      margin:6px 0 10px 0;
+      font-size:20px;
+      color: var(--blue-deep);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:600;
+    }
+
+    .desc {
+      color: #14568a;
+      font-size:13px;
+      margin-bottom:16px;
+    }
+
+    .uploader {
+      background: linear-gradient(180deg, var(--glass), var(--glass-2));
+      border-radius:12px;
+      padding:12px;
+      border: 1px dashed rgba(13,71,161,0.08);
+    }
+
+    .dropzone {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:8px;
+      padding:18px;
+      border-radius:10px;
+      cursor:pointer;
+      transition:all .18s ease;
+    }
+    .dropzone:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+
+    .dropzone p { margin:0; font-size:14px; color:var(--blue-mid); }
+
+    input[type="file"] {
+      display:none;
+    }
+
+    .controls {
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+
+    select, button, .tiny {
+      padding:10px 12px;
+      border-radius:10px;
+      font-size:14px;
+      border:none;
+      outline:none;
+    }
+
+    select {
+      background:#fff;
+      color:var(--blue-deep);
+      box-shadow: 0 2px 8px rgba(3,54,120,0.03);
+      min-width:140px;
+    }
+
+    button.primary {
+      background: linear-gradient(90deg,var(--accent),var(--blue-mid));
+      color:#fff;
+      cursor:pointer;
+      font-weight:600;
+      border: none;
+      box-shadow: 0 6px 18px rgba(0,195,255,0.12);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--blue-mid);
+      border: 1px solid rgba(13,71,161,0.08);
+    }
+
+    .progress {
+      margin-top:12px;
+      height:10px;
+      background: rgba(13,71,161,0.06);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .progress > i {
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg,var(--accent),var(--blue-mid));
+      transition: width .2s linear;
+    }
+
+    /* Right (preview) */
+    .right {
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .previewBox {
+      background: linear-gradient(180deg, rgba(13,71,161,0.03), rgba(13,71,161,0.015));
+      border-radius:12px;
+      padding:8px;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-start;
+      border:1px solid rgba(13,71,161,0.04);
+    }
+
+    video {
+      width:100%;
+      max-height:240px;
+      border-radius:10px;
+      background:#000;
+    }
+
+    audio {
+      width:100%;
+      margin-top:6px;
+    }
+
+    .meta {
+      width:100%;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      font-size:13px;
+      color:#0b4b72;
+    }
+
+    .download {
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    a.download-link {
+      text-decoration:none;
+      padding:8px 12px;
+      border-radius:10px;
+      background: linear-gradient(90deg,var(--accent),var(--blue-mid));
+      color:#fff;
+      font-weight:600;
+      box-shadow: 0 6px 18px rgba(0,195,255,0.12);
+    }
+
+    /* Responsive */
+    @media(max-width:880px){
+      .card { grid-template-columns: 1fr; }
+      .right { order:-1; }
+    }
+    @media(max-width:420px){
+      h1 { font-size:18px; }
+      .card{ padding:12px; border-radius:14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="main">
+      <div class="left">
+        <h1>🎬 Video ➜ MP3</h1>
+        <div class="desc">Upload a video, extract audio and download as MP3 — sab browser mein, client-side. (No server.)</div>
+
+        <div class="uploader" id="uploader">
+          <label class="dropzone" id="dropzone">
+            <input id="fileInput" type="file" accept="video/*">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M12 3v12" stroke="#0077d6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 7l4-4 4 4" stroke="#00c3ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="3" y="13" width="18" height="8" rx="2" stroke="#0d47a1" stroke-width="1.2" fill="rgba(0,123,255,0.03)"/>
+            </svg>
+            <p id="dropText">Click or drop a video here to upload</p>
+            <small style="color:#0b4b72;opacity:.9">Supported: mp4, webm, mov (browser dependent)</small>
+          </label>
+        </div>
+
+        <div class="controls">
+          <select id="bitrate">
+            <option value="128">MP3 - 128 kbps (balanced)</option>
+            <option value="192">MP3 - 192 kbps (higher)</option>
+            <option value="64">MP3 - 64 kbps (small size)</option>
+          </select>
+          <button class="primary" id="convertBtn">Convert to MP3</button>
+          <button class="secondary" id="clearBtn" title="Clear">Clear</button>
+        </div>
+
+        <div class="progress" aria-hidden>
+          <i id="progressBar"></i>
+        </div>
+
+        <div style="margin-top:12px; font-size:13px; color:#0b4b72;">
+          <strong>Status:</strong> <span id="status">Waiting for video...</span>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="previewBox">
+          <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-weight:600; color:var(--blue-deep)">Preview</div>
+            <div style="font-size:12px; color:#0b4b72" id="fileInfo">No file</div>
+          </div>
+
+          <video id="videoPreview" controls playsinline></video>
+          <div id="audioWrapper" style="display:none; width:100%;"><audio id="audioPreview" controls></audio></div>
+
+          <div class="meta">
+            <div id="metaLeft">Duration: —</div>
+            <div class="download" id="downloadArea"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/*
+  Video -> MP3 converter (client-side)
+  Approach:
+   - Load video into <video> element
+   - Use WebAudio (AudioContext + MediaElementSource) to pull raw PCM frames
+   - Collect Float32 samples via ScriptProcessorNode
+   - Convert to 16-bit PCM and encode to MP3 using lamejs
+   - Provide download link & audio preview
+  Note: For long videos this might consume a lot of memory on low-end devices.
+*/
+
+const fileInput = document.getElementById('fileInput');
+const dropzone = document.getElementById('dropzone');
+const dropText = document.getElementById('dropText');
+const videoPreview = document.getElementById('videoPreview');
+const audioPreview = document.getElementById('audioPreview');
+const audioWrapper = document.getElementById('audioWrapper');
+const convertBtn = document.getElementById('convertBtn');
+const clearBtn = document.getElementById('clearBtn');
+const statusEl = document.getElementById('status');
+const progressBar = document.getElementById('progressBar');
+const bitrateEl = document.getElementById('bitrate');
+const fileInfo = document.getElementById('fileInfo');
+const metaLeft = document.getElementById('metaLeft');
+const downloadArea = document.getElementById('downloadArea');
+
+let selectedFile = null;
+let audioContext = null;
+let processor = null;
+let sourceNode = null;
+let mp3BlobUrl = null;
+
+function resetUI() {
+  selectedFile = null;
+  videoPreview.src = '';
+  audioPreview.src = '';
+  audioWrapper.style.display = 'none';
+  statusEl.innerText = 'Waiting for video...';
+  progressBar.style.width = '0%';
+  fileInfo.innerText = 'No file';
+  metaLeft.innerText = 'Duration: —';
+  downloadArea.innerHTML = '';
+  // close audioContext if exists
+  if (audioContext) {
+    try { audioContext.close(); } catch(e){}
+    audioContext = null;
+  }
+}
+resetUI();
+
+// Drag & drop support
+['dragenter','dragover'].forEach(evt => {
+  dropzone.addEventListener(evt, e => {
+    e.preventDefault(); e.stopPropagation();
+    dropzone.style.transform = 'translateY(-4px)';
+  });
+});
+['dragleave','drop'].forEach(evt => {
+  dropzone.addEventListener(evt, e => {
+    e.preventDefault(); e.stopPropagation();
+    dropzone.style.transform = 'translateY(0)';
+  });
+});
+dropzone.addEventListener('drop', e => {
+  const dt = e.dataTransfer;
+  if (dt && dt.files && dt.files.length) {
+    handleFile(dt.files[0]);
+  }
+});
+
+// Click to open input
+dropzone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => {
+  if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+clearBtn.addEventListener('click', resetUI);
+
+function handleFile(file) {
+  if (!file.type.startsWith('video/')) {
+    alert('Please upload a video file.');
+    return;
+  }
+  selectedFile = file;
+  fileInfo.innerText = `${file.name} • ${(file.size/1024/1024).toFixed(2)} MB`;
+  statusEl.innerText = 'Video loaded. Ready to preview.';
+  const url = URL.createObjectURL(file);
+  videoPreview.src = url;
+  videoPreview.load();
+  videoPreview.onloadedmetadata = () => {
+    metaLeft.innerText = `Duration: ${formatTime(videoPreview.duration)} • Resolution: ${videoPreview.videoWidth}x${videoPreview.videoHeight}`;
+  };
+  audioPreview.src = '';
+  audioWrapper.style.display = 'none';
+  downloadArea.innerHTML = '';
+  progressBar.style.width = '0%';
+}
+
+function formatTime(seconds) {
+  if (!isFinite(seconds)) return '—';
+  const m = Math.floor(seconds/60);
+  const s = Math.floor(seconds%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+// Convert button
+convertBtn.addEventListener('click', async () => {
+  if (!selectedFile) { alert('Upload a video first.'); return; }
+  try {
+    convertBtn.disabled = true;
+    clearBtn.disabled = true;
+    statusEl.innerText = 'Preparing audio extraction...';
+    await extractAndEncode();
+  } catch (err) {
+    console.error(err);
+    alert('Conversion failed: ' + (err && err.message ? err.message : err));
+    statusEl.innerText = 'Error.';
+  } finally {
+    convertBtn.disabled = false;
+    clearBtn.disabled = false;
+  }
+});
+
+async function extractAndEncode() {
+  // Ensure lamejs loaded
+  if (typeof lamejs === 'undefined' && typeof window.lamejs === 'undefined') {
+    throw new Error('MP3 encoder (lamejs) not loaded. Please check CDN.');
+  }
+  // Create AudioContext
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) throw new Error('Web Audio API not supported in this browser.');
+
+  audioContext = new AudioContext();
+
+  // Use the video element as source
+  // For captureStream compatibility, ensure the video is ready to play
+  // We'll play the video muted (not visible audio) to let the MediaElementSource produce audio; set preload to metadata already handled.
+  videoPreview.muted = true;
+  // Play video silently (some browsers require a user gesture; conversion initiated by button click qualifies)
+  try { await videoPreview.play(); } catch(e) { /* ignore autoplay restrictions */ }
+
+  sourceNode = audioContext.createMediaElementSource(videoPreview);
+
+  // Create ScriptProcessor to capture raw audio
+  const bufferSize = 4096;
+  const numberOfInputChannels = 2;
+  const numberOfOutputChannels = 2;
+  processor = audioContext.createScriptProcessor(bufferSize, numberOfInputChannels, numberOfOutputChannels);
+
+  const mp3Data = [];
+  const sampleRate = 44100; // we'll resample if needed
+  const chosenBitrate = parseInt(bitrateEl.value, 10) || 128;
+
+  // Initialize MP3 encoder
+  const mp3encoder = new lamejs.Mp3Encoder(2, sampleRate, chosenBitrate);
+
+  // If audioContext sampleRate != target sampleRate, we will resample per block
+  const fromSampleRate = audioContext.sampleRate;
+  const needResample = fromSampleRate !== sampleRate;
+
+  let recording = true;
+  let collected = 0;
+  statusEl.innerText = 'Recording audio from video...';
+  progressBar.style.width = '2%';
+
+  // Handle audio processing
+  processor.onaudioprocess = function(e) {
+    if (!recording) return;
+    const left = e.inputBuffer.getChannelData(0);
+    const right = e.inputBuffer.numberOfChannels > 1 ? e.inputBuffer.getChannelData(1) : left;
+
+    // If sampling rates differs, resample to target sampleRate
+    let leftSamples = left;
+    let rightSamples = right;
+    if (needResample) {
+      leftSamples = resample(left, fromSampleRate, sampleRate);
+      rightSamples = resample(right, fromSampleRate, sampleRate);
+    }
+
+    // Interleave & convert to 16-bit PCM
+    const interleaved = interleave(leftSamples, rightSamples);
+    const mp3buf = floatTo16BitPCMAndEncode(interleaved, mp3encoder);
+    if (mp3buf.length > 0) {
+      mp3Data.push(new Int8Array(mp3buf));
+    }
+    collected += interleaved.length;
+    // update progress based on currentTime / duration
+    if (videoPreview.duration && isFinite(videoPreview.duration)) {
+      const p = Math.min(98, Math.round((videoPreview.currentTime / videoPreview.duration) * 98));
+      progressBar.style.width = p + '%';
+    }
+  };
+
+  // connect nodes
+  sourceNode.connect(processor);
+  processor.connect(audioContext.destination); // must connect to destination in some browsers to start processing
+
+  // Play the video from start (or keep current time) and record until ended
+  videoPreview.currentTime = 0;
+  await videoPreview.play().catch(()=>{});
+  statusEl.innerText = 'Recording...';
+
+  // Wait until video ends
+  await new Promise((resolve) => {
+    function onEnded() {
+      resolve();
+    }
+    videoPreview.addEventListener('ended', onEnded, { once: true });
+    // Also provide manual stop after 60 minutes safety (prevent indefinite)
+    const maxTimeout = Math.max(600000, (videoPreview.duration || 0) * 1000 + 5000); // at least 10 min or duration+5s
+    setTimeout(resolve, maxTimeout);
+  });
+
+  // Stop recording
+  recording = false;
+  statusEl.innerText = 'Finalizing MP3...';
+  progressBar.style.width = '96%';
+
+  // Flush encoder (get remaining data)
+  try {
+    const mp3buf = mp3encoder.flush(); // Int8Array
+    if (mp3buf.length > 0) mp3Data.push(new Int8Array(mp3buf));
+  } catch(e) {
+    console.warn('Flush error', e);
+  }
+
+  // Cleanup audio nodes
+  try {
+    processor.disconnect();
+    if (sourceNode) sourceNode.disconnect();
+    // don't close audioContext just yet
+  } catch(e){}
+
+  // Combine mp3 chunks
+  const blobParts = mp3Data.map(arr => arr.buffer);
+  const mp3Blob = new Blob(blobParts, { type: 'audio/mp3' });
+
+  // Create download link and audio preview
+  if (mp3BlobUrl) URL.revokeObjectURL(mp3BlobUrl);
+  mp3BlobUrl = URL.createObjectURL(mp3Blob);
+  audioPreview.src = mp3BlobUrl;
+  audioWrapper.style.display = 'block';
+  downloadArea.innerHTML = `<a class="download-link" href="${mp3BlobUrl}" download="${sanitizeFilename(selectedFile.name)}.mp3">⬇️ Download MP3</a>`;
+
+  statusEl.innerText = 'Conversion complete ✅';
+  progressBar.style.width = '100%';
+
+  // close audio context to free resources
+  try { await audioContext.close(); } catch(e){}
+  audioContext = null;
+}
+
+// Helpers
+
+function sanitizeFilename(name) {
+  return name.replace(/\.[^/.]+$/, '') // remove extension
+             .replace(/[^\w\-_. ]+/g,'') // remove odd chars
+             .substring(0,160);
+}
+
+function interleave(left, right) {
+  const length = left.length + right.length;
+  const result = new Float32Array(length);
+  let index = 0, inputIndex = 0;
+  while (index < length) {
+    result[index++] = left[inputIndex];
+    result[index++] = right[inputIndex];
+    inputIndex++;
+  }
+  return result;
+}
+
+function floatTo16BitPCMAndEncode(float32Array, mp3encoder) {
+  // convert float samples [-1..1] to 16-bit PCM
+  const maxSamples = float32Array.length;
+  const buffer = new Int16Array(maxSamples);
+  for (let i = 0; i < maxSamples; i++) {
+    let s = Math.max(-1, Math.min(1, float32Array[i]));
+    buffer[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+
+  // Split into left & right for encoder (since we interleaved: L R L R ...)
+  const left = new Int16Array(Math.floor(buffer.length/2));
+  const right = new Int16Array(Math.floor(buffer.length/2));
+  for (let i = 0, j=0; j < left.length; i += 2, j++) {
+    left[j]  = buffer[i];
+    right[j] = buffer[i+1];
+  }
+
+  // feed to mp3 encoder
+  const mp3buf = mp3encoder.encodeBuffer(left, right); // returns Int8Array
+  return mp3buf || new Int8Array([]);
+}
+
+function resample(buffer, fromSampleRate, toSampleRate) {
+  // Simple linear interpolation resampler
+  const ratio = fromSampleRate / toSampleRate;
+  if (ratio === 1) return buffer;
+  const newLength = Math.round(buffer.length / ratio);
+  const out = new Float32Array(newLength);
+  const springFactor = (buffer.length - 1) / (newLength - 1);
+  out[0] = buffer[0];
+  for (let i=1; i<newLength-1; i++) {
+    const tmp = i * springFactor;
+    const before = Math.floor(tmp);
+    const after = Math.ceil(tmp);
+    const atPoint = tmp - before;
+    out[i] = buffer[before] + (buffer[after] - buffer[before]) * atPoint;
+  }
+  out[newLength-1] = buffer[buffer.length-1];
+  return out;
+}
+
+</script>
+</body>
+</html>
