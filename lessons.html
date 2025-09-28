@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typing Lessons | Learn Typing Online</title>
+<meta name="description" content="Learn typing online with free typing lessons from beginner to advanced. Improve your speed and accuracy. Mobile-friendly and responsive.">
+<meta name="keywords" content="Typing Lessons, Learn Typing, Typing Practice, Online Typing Lessons, Improve Typing Speed, Typing Accuracy">
+<meta name="robots" content="index, follow">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0d6efd, #ffffff);
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+h1, h2 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+.container {
+  background: #fff;
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  text-align: left;
+}
+textarea, select, button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 2px solid #0d6efd;
+  font-size: 16px;
+}
+button {
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+button:hover {
+  background: #0b5ed7;
+}
+#lessonText {
+  background: #f0f8ff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  min-height: 100px;
+}
+.stats {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+.ads {
+  margin: 15px 0;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<h1>📝 Typing Lessons</h1>
+<h2>Practice and improve your typing skills</h2>
+
+<!-- 🔹 Top Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {'key':'a4236a38fef8b51c08a860f7e29b1a32','format':'iframe','height':90,'width':728,'params':{}};
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+</div>
+
+<div class="container">
+  <label>Select Lesson:</label>
+  <select id="lessonSelect">
+    <option value="1">Lesson 1 - Beginner Words</option>
+    <option value="2">Lesson 2 - Common Sentences</option>
+    <option value="3">Lesson 3 - Paragraph Practice</option>
+  </select>
+  <button onclick="startLesson()">Start Lesson</button>
+
+  <div id="lessonText"></div>
+  <textarea id="inputArea" placeholder="Start typing here..." disabled></textarea>
+  <div class="stats" id="stats">WPM: 0 | Accuracy: 0%</div>
+</div>
+
+<!-- 🔹 Middle Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+</div>
+
+<!-- 🔹 Bottom Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {'key':'496188380e746eef901d9058c8f77c85','format':'iframe','height':60,'width':468,'params':{}};
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+</div>
+
+<script>
+const lessons = {
+  1: ["cat dog sun run bat mat rat", "hat sat pat fan man pan"],
+  2: ["Typing is fun and improves your skills.", "Practice daily to increase typing speed and accuracy."],
+  3: [
+    "The quick brown fox jumps over the lazy dog to test your typing skills.",
+    "Learning to type accurately and quickly is an essential skill for everyone."
+  ]
+};
+
+let interval, startTime, wordsTyped = 0;
+
+function getRandomLesson(lessonId) {
+  const arr = lessons[lessonId];
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function startLesson() {
+  const lessonId = document.getElementById('lessonSelect').value;
+  document.getElementById('inputArea').value = '';
+  document.getElementById('stats').innerText = "WPM: 0 | Accuracy: 0%";
+  document.getElementById('lessonText').innerText = getRandomLesson(lessonId);
+  document.getElementById('inputArea').disabled = false;
+  document.getElementById('inputArea').focus();
+  wordsTyped = 0;
+  startTime = Date.now();
+
+  if(interval) clearInterval(interval);
+  interval = setInterval(updateStats, 1000);
+}
+
+document.getElementById('inputArea').addEventListener('input', () => {
+  const typed = document.getElementById('inputArea').value;
+  const lessonText = document.getElementById('lessonText').innerText;
+  if(typed.length >= lessonText.length){
+    const lessonId = document.getElementById('lessonSelect').value;
+    document.getElementById('lessonText').innerText = getRandomLesson(lessonId);
+    document.getElementById('inputArea').value = '';
+  }
+});
+
+function updateStats() {
+  const typed = document.getElementById('inputArea').value;
+  const lessonText = document.getElementById('lessonText').innerText;
+  wordsTyped = typed.trim().split(/\s+/).length;
+
+  let correctChars = 0;
+  for(let i=0;i<typed.length;i++){
+    if(typed[i] === lessonText[i]) correctChars++;
+  }
+
+  const accuracy = typed.length === 0 ? 0 : Math.round((correctChars/typed.length)*100);
+  const elapsedMinutes = (Date.now() - startTime)/60000;
+  const wpm = Math.round(wordsTyped/elapsedMinutes);
+
+  document.getElementById('stats').innerText = `WPM: ${wpm} | Accuracy: ${accuracy}%`;
+}
+</script>
+
+</body>
+</html>
