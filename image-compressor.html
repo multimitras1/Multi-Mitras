@@ -1,595 +1,206 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Responsive Image Compressor — KathaByte Tools</title>
-
-  <!-- JSZip for batch download -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Compressor Tool</title>
   <style>
-    :root{
-      --bg1:#eaf6ff;
-      --blue-deep:#0d47a1;
-      --blue-mid:#0077d6;
-      --accent:#00c3ff;
-      --card-radius:14px;
-      --text-dark:#042a4a;
-      --glass: rgba(255,255,255,0.94);
-      --gap:16px;
-      --maxw:1100px;
-      --touch:48px;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0d47a1, #1976d2);
+      color: #fff;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;background:
-      radial-gradient(1200px 600px at 10% 10%, rgba(0,195,255,0.06), transparent),
-      linear-gradient(135deg,#e6f4ff 0%, #ffffff 60%); color:var(--text-dark); -webkit-font-smoothing:antialiased;}
-    .page {
-      min-height:100vh;
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
-      padding:20px;
+    header {
+      text-align: center;
+      padding: 10px;
+      background: #1565c0;
     }
-
     .container {
-      width:100%;
-      max-width:var(--maxw);
-      display:grid;
-      grid-template-columns: 1fr 340px;
-      gap:24px;
-      align-items:start;
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+    }
+    .tool-area {
+      flex: 1;
+      min-width: 280px;
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .tool-area input, .tool-area button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    .tool-area button {
+      background: #1976d2;
+      color: #fff;
+      cursor: pointer;
+    }
+    .tool-area button:hover {
+      background: #0d47a1;
+    }
+    .preview {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .preview img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .ads {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .sidebar {
+      width: 160px;
+      min-width: 160px;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      background: #0d47a1;
+      padding: 15px;
+      margin-top: 20px;
     }
 
-    .card {
-      background: linear-gradient(180deg, var(--glass), rgba(255,255,255,0.90));
-      border-radius:12px;
-      padding:16px;
-      box-shadow: 0 10px 30px rgba(3,54,120,0.06);
-      border:1px solid rgba(13,71,161,0.06);
+    /* Responsive */
+    @media (min-width: 900px) {
+      .sidebar {
+        display: block;
+      }
     }
-
-    header.card {
-      grid-column:1/-1;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    h1 { margin:0; font-size:18px; color:var(--blue-deep); display:flex; align-items:center; gap:10px; }
-    p.lead { margin:6px 0 0; color:#0b4b72; font-size:13px; }
-
-    /* Uploader area */
-    .uploader {
-      border-radius:10px;
-      padding:14px;
-      background: linear-gradient(180deg, rgba(13,71,161,0.03), rgba(13,71,161,0.015));
-      border:1px dashed rgba(13,71,161,0.06);
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      align-items:center;
-      justify-content:center;
-      min-height:160px;
-    }
-    .drop {
-      width:100%;
-      padding:14px;
-      border-radius:10px;
-      text-align:center;
-      cursor:pointer;
-      background:linear-gradient(180deg,#fff,#fbfdff);
-      box-shadow: 0 6px 18px rgba(0,195,255,0.04);
-      border:1px solid rgba(13,71,161,0.04);
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      align-items:center;
-    }
-    .drop input { display:none; }
-    .small { font-size:13px; color:#0b4b72; }
-
-    /* controls */
-    .controls-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; margin-top:6px; }
-    label { display:block; font-size:13px; color:#0b4b72; margin-bottom:6px; }
-    select, input[type="number"], input[type="range"], button {
-      padding:10px; border-radius:10px; border:1px solid rgba(13,71,161,0.06); font-size:14px; background:#fff; color:var(--text-dark);
-    }
-    input[type="range"] { width:100%; -webkit-appearance:none; height:6px; background:linear-gradient(90deg,var(--accent),var(--blue-mid)); border-radius:6px; }
-    .controls-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; width:100%; }
-    button.primary { flex:1; min-height:var(--touch); background:linear-gradient(90deg,var(--accent),var(--blue-mid)); color:#fff; cursor:pointer; font-weight:700; border:none; border-radius:10px; }
-    button.secondary { flex:1; min-height:var(--touch); background:#fff; color:var(--blue-deep); border:1px solid rgba(13,71,161,0.06); border-radius:10px; cursor:pointer; }
-    button.small { padding:8px 10px; font-size:13px; }
-
-    /* preview list */
-    .preview-list { margin-top:12px; display:grid; gap:10px; max-height:520px; overflow:auto; padding-right:6px; }
-    .preview-item { display:flex; gap:12px; align-items:center; padding:10px; border-radius:10px; background:#fff; border:1px solid rgba(13,71,161,0.04); }
-    .preview-item img { width:96px; height:64px; object-fit:cover; border-radius:8px; }
-    .meta { font-size:13px; color:#0b4b72; }
-    .meta .line { display:flex; justify-content:space-between; gap:8px; }
-    .meta .actions { margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; }
-
-    /* right sidebar */
-    .sidebar { display:flex; flex-direction:column; gap:12px; }
-    .ad-slot { text-align:center; margin:6px 0; }
-
-    footer.card { grid-column:1/-1; text-align:center; font-size:12px; color:#0b4b72; }
-
-    /* Responsive layout */
-    @media (max-width: 980px) {
-      .container { grid-template-columns: 1fr; }
-      .sidebar { order:-1; }
-      .preview-item img { width:72px; height:54px; }
-      .controls-grid { grid-template-columns:1fr; }
-      button.primary, button.secondary { min-height:54px; font-size:16px; }
-    }
-
-    @media (max-width: 420px) {
-      h1 { font-size:16px; }
-      .drop { padding:12px; }
-      .preview-item { padding:8px; }
-      .preview-list { max-height:360px; }
-    }
-
-    /* accessibility focus */
-    .drop:focus { outline:3px solid rgba(0,195,255,0.18); }
-
   </style>
 </head>
 <body>
-  <div class="page">
-    <div class="container" role="main" aria-label="Image Compressor Tool">
 
-      <!-- Header + Top Ad placeholder -->
-      <header class="card" role="banner">
-        <div>
-          <h1>🖼️ Image Compressor</h1>
-          <p class="lead">Compress images in-browser — choose format, quality, resize and download. Batch support included.</p>
-        </div>
+  <header>
+    <h1>Image Compressor Tool</h1>
+    <!-- Header Ad -->
+    <div class="ads">
+      <!-- 728x90 for desktop / 320x50 for mobile -->
+      <script type="text/javascript">
+        atOptions = {
+          'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+          'format' : 'iframe',
+          'height' : 90,
+          'width' : 728,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+    </div>
+  </header>
 
-        <!-- top ad container: JS will inject appropriate script based on device width -->
-        <div id="topAd" style="min-width:220px;text-align:right"></div>
-      </header>
+  <div class="container">
+    <div class="tool-area">
+      <h2>Upload and Compress Image</h2>
+      <input type="file" id="upload" accept="image/*">
+      <input type="range" id="quality" min="10" max="100" value="70">
+      <button onclick="compressImage()">Compress & Download</button>
+      <div class="preview" id="preview"></div>
 
-      <!-- Main column -->
-      <section class="card" aria-labelledby="uploaderTitle">
-        <div id="uploaderTitle" style="font-weight:700; color:var(--blue-deep); margin-bottom:8px">Upload / Drop Images</div>
-        <div class="uploader" id="uploader">
-          <label class="drop" id="dropzone" tabindex="0" aria-label="Upload images">
-            <input type="file" id="fileInput" accept="image/*" multiple aria-label="Select images">
-            <div style="font-weight:700; color:var(--blue-deep)">Tap or drop images here</div>
-            <div class="small">Supported: JPEG, PNG, WebP — use modern browser for best results</div>
-          </label>
+      <!-- Mid Content Ad -->
+      <div class="ads">
+        <!-- 300x250 Ad -->
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+      </div>
+    </div>
 
-          <div class="controls-grid" style="width:100%">
-            <div>
-              <label for="format">Output Format</label>
-              <select id="format" aria-label="Output format">
-                <option value="image/webp">WebP (recommended)</option>
-                <option value="image/jpeg">JPEG</option>
-                <option value="image/png">PNG</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="quality">Quality: <span id="qLabel">80%</span></label>
-              <input id="quality" type="range" min="10" max="100" value="80" aria-label="Quality slider">
-            </div>
-
-            <div>
-              <label for="maxWidth">Max Width (px) — 0 = keep</label>
-              <input id="maxWidth" type="number" min="0" value="0" aria-label="Max width">
-            </div>
-
-            <div>
-              <label for="maxHeight">Max Height (px) — 0 = keep</label>
-              <input id="maxHeight" type="number" min="0" value="0" aria-label="Max height">
-            </div>
-          </div>
-
-          <div class="controls-row" role="group" aria-label="Actions">
-            <button class="primary" id="compressBtn">Compress Selected</button>
-            <button class="secondary" id="downloadAllBtn">Download All (ZIP)</button>
-            <button class="secondary" id="clearBtn">Clear</button>
-          </div>
-
-          <div style="width:100%; margin-top:6px; text-align:center;" class="small">Tip: For web use WebP + quality 60–80. For photos use JPEG 80–90.</div>
-        </div>
-
-        <div id="previewList" class="preview-list" aria-live="polite">
-          <div class="small" style="opacity:.8">No images yet — upload to start compressing.</div>
-        </div>
-
-        <!-- middle ad placeholder -->
-        <div id="midAd" style="margin-top:12px; text-align:center"></div>
-
-      </section>
-
-      <!-- Sidebar -->
-      <aside class="card sidebar" aria-label="Options and ads">
-        <div>
-          <label class="small">Selected files</label>
-          <div id="summary" class="small">0 files · Total original: 0 KB</div>
-        </div>
-
-        <div>
-          <label class="small">Last operation</label>
-          <div id="lastOp" class="small">—</div>
-        </div>
-
-        <!-- side ad placeholder -->
-        <div id="sideAd" class="ad-slot" aria-hidden></div>
-
-        <!-- bottom small banner placeholder -->
-        <div id="bottomAd" class="ad-slot" aria-hidden></div>
-      </aside>
-
-      <footer class="card" role="contentinfo">
-        Image Compressor • Client-side compression — images stay in your device unless you add server-side logic.
-      </footer>
+    <!-- Sidebar Ad (Desktop Only) -->
+    <div class="sidebar ads">
+      <!-- 160x300 Ad -->
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '962ff242b01ed125eb9b14423f7dbd3f',
+          'format' : 'iframe',
+          'height' : 300,
+          'width' : 160,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js"></script>
     </div>
   </div>
 
-<script>
-/* ========= AD LOADING: device-specific injection =========
-   We will inject ad scripts based on current viewport width.
-   Desktop: load 728x90 (top), 160x300 (side), 468x60 (bottom)
-   Mobile: load 320x50 (top/bottom), 300x250 (mid)
-   Note: ad provider scripts provided by user are used verbatim.
-*/
-function injectScript(id, src, parentEl) {
-  // avoid duplicate
-  if (document.getElementById(id)) return;
-  const s = document.createElement('script');
-  s.id = id;
-  s.type = 'text/javascript';
-  s.src = src;
-  parentEl.appendChild(s);
-}
+  <footer>
+    <p>© 2025 Multi-Tool Website</p>
+    <!-- Footer Ad -->
+    <div class="ads">
+      <!-- 468x60 Ad -->
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '496188380e746eef901d9058c8f77c85',
+          'format' : 'iframe',
+          'height' : 60,
+          'width' : 468,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+    </div>
+  </footer>
 
-function injectInlineScript(parentEl, code) {
-  const s = document.createElement('script');
-  s.type = 'text/javascript';
-  s.innerHTML = code;
-  parentEl.appendChild(s);
-}
+  <script>
+    let uploadedImage = null;
 
-function loadAdsResponsive() {
-  const w = window.innerWidth || document.documentElement.clientWidth;
-  const topAd = document.getElementById('topAd');
-  const sideAd = document.getElementById('sideAd');
-  const midAd = document.getElementById('midAd');
-  const bottomAd = document.getElementById('bottomAd');
-
-  // Clear any existing
-  [topAd, sideAd, midAd, bottomAd].forEach(el => el && (el.innerHTML = ''));
-
-  if (w >= 900) {
-    // Desktop layout
-    // Top 728x90
-    injectInlineScript(topAd, `
-      atOptions = {'key':'a4236a38fef8b51c08a860f7e29b1a32','format':'iframe','height':90,'width':728,'params':{}};
-    `);
-    injectScript('ad728','//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js', topAd);
-
-    // Side 160x300
-    injectInlineScript(sideAd, `
-      atOptions = {'key':'962ff242b01ed125eb9b14423f7dbd3f','format':'iframe','height':300,'width':160,'params':{}};
-    `);
-    injectScript('ad160','//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js', sideAd);
-
-    // Mid: 300x250 as supporting
-    injectInlineScript(midAd, `
-      atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};
-    `);
-    injectScript('ad300','//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js', midAd);
-
-    // Bottom small 468x60
-    injectInlineScript(bottomAd, `
-      atOptions = {'key':'496188380e746eef901d9058c8f77c85','format':'iframe','height':60,'width':468,'params':{}};
-    `);
-    injectScript('ad468','//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js', bottomAd);
-
-  } else {
-    // Mobile layout
-    // Top 320x50
-    injectInlineScript(topAd, `
-      atOptions = {'key':'e38b91a0e0dc32981096ab740b4d4a67','format':'iframe','height':50,'width':320,'params':{}};
-    `);
-    injectScript('ad320_top','//lightingshovestature.com/e38b91a0e0dc32981096ab740b4d4a67/invoke.js', topAd);
-
-    // Mid 300x250 (falls nicely in content)
-    injectInlineScript(midAd, `
-      atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};
-    `);
-    injectScript('ad300_mobile','//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js', midAd);
-
-    // Bottom 320x50
-    injectInlineScript(bottomAd, `
-      atOptions = {'key':'e38b91a0e0dc32981096ab740b4d4a67','format':'iframe','height':50,'width':320,'params':{}};
-    `);
-    injectScript('ad320_bottom','//lightingshovestature.com/e38b91a0e0dc32981096ab740b4d4a67/invoke.js', bottomAd);
-  }
-}
-
-// initial ad load
-loadAdsResponsive();
-// reload ads if orientation or resize significant
-let resizeTimeout;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(loadAdsResponsive, 400);
-});
-window.addEventListener('orientationchange', () => setTimeout(loadAdsResponsive, 600));
-
-/* ========= IMAGE COMPRESSOR LOGIC ========= */
-const dropzone = document.getElementById('dropzone');
-const fileInput = document.getElementById('fileInput');
-const previewList = document.getElementById('previewList');
-const formatEl = document.getElementById('format');
-const qualityEl = document.getElementById('quality');
-const qLabel = document.getElementById('qLabel');
-const maxWidthEl = document.getElementById('maxWidth');
-const maxHeightEl = document.getElementById('maxHeight');
-const compressBtn = document.getElementById('compressBtn');
-const clearBtn = document.getElementById('clearBtn');
-const downloadAllBtn = document.getElementById('downloadAllBtn');
-const summary = document.getElementById('summary');
-const lastOp = document.getElementById('lastOp');
-
-let files = []; // {file, url, compressedBlob, compressedSize}
-
-qualityEl.addEventListener('input', () => qLabel.innerText = qualityEl.value + '%');
-
-/* Drag & drop */
-['dragenter','dragover'].forEach(evt => {
-  dropzone.addEventListener(evt, e => {
-    e.preventDefault(); e.stopPropagation();
-    dropzone.style.boxShadow = '0 8px 22px rgba(0,195,255,0.12)';
-  });
-});
-['dragleave','drop'].forEach(evt => {
-  dropzone.addEventListener(evt, e => {
-    e.preventDefault(); e.stopPropagation();
-    dropzone.style.boxShadow = '';
-  });
-});
-dropzone.addEventListener('drop', e => {
-  const dt = e.dataTransfer;
-  if (dt && dt.files) handleFiles(dt.files);
-});
-dropzone.addEventListener('click', () => fileInput.click());
-dropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
-
-fileInput.addEventListener('change', e => handleFiles(e.target.files));
-
-function handleFiles(fileList){
-  const arr = Array.from(fileList).filter(f => f.type.startsWith('image/'));
-  if (!arr.length) { alert('Please select image files.'); return; }
-  arr.forEach(f => {
-    const url = URL.createObjectURL(f);
-    files.push({ file: f, url, compressedBlob: null, compressedSize: 0 });
-  });
-  renderPreviews();
-}
-
-function renderPreviews(){
-  previewList.innerHTML = '';
-  if (!files.length) {
-    previewList.innerHTML = '<div class="small" style="opacity:.85">No images yet — upload to start compressing.</div>';
-    summary.innerText = '0 files · Total original: 0 KB';
-    return;
-  }
-  let totalOrig = 0;
-  files.forEach((item, idx) => {
-    totalOrig += item.file.size;
-    const div = document.createElement('div');
-    div.className = 'preview-item';
-    div.innerHTML = `
-      <img src="${item.url}" alt="${escapeHtml(item.file.name)}" />
-      <div style="flex:1;text-align:left">
-        <div class="meta line">
-          <div style="font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(item.file.name)}</div>
-          <div style="font-size:13px;color:#0b4b72">${(item.file.size/1024).toFixed(1)} KB</div>
-        </div>
-        <div class="meta">
-          <div>Output: ${item.compressedBlob ? (item.compressedSize/1024).toFixed(1)+' KB' : 'Not compressed'}</div>
-          <div class="actions">
-            <button class="secondary small" data-idx="${idx}" data-action="compress">Compress</button>
-            <button class="secondary small" data-idx="${idx}" data-action="download" ${item.compressedBlob ? '' : 'disabled'}>Download</button>
-            <button class="secondary small" data-idx="${idx}" data-action="remove">Remove</button>
-          </div>
-        </div>
-      </div>
-    `;
-    previewList.appendChild(div);
-  });
-  summary.innerText = `${files.length} files · Total original: ${(totalOrig/1024).toFixed(1)} KB`;
-  attachPreviewButtons();
-}
-
-function attachPreviewButtons(){
-  previewList.querySelectorAll('button[data-action]').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const idx = +e.currentTarget.getAttribute('data-idx');
-      const action = e.currentTarget.getAttribute('data-action');
-      if (action === 'compress') {
-        await compressSingle(idx);
-      } else if (action === 'download') {
-        downloadBlob(files[idx].compressedBlob, makeFilename(files[idx].file.name));
-      } else if (action === 'remove') {
-        URL.revokeObjectURL(files[idx].url);
-        files.splice(idx,1);
-        renderPreviews();
+    document.getElementById('upload').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          uploadedImage = new Image();
+          uploadedImage.src = event.target.result;
+          uploadedImage.onload = function () {
+            document.getElementById('preview').innerHTML = '<img src="' + uploadedImage.src + '">';
+          };
+        };
+        reader.readAsDataURL(file);
       }
     });
-  });
-}
 
-/* Batch operations */
-compressBtn.addEventListener('click', async () => {
-  if (!files.length) { alert('No images selected.'); return; }
-  lastOp.innerText = 'Compressing all...';
-  for (let i=0;i<files.length;i++){
-    await compressSingle(i);
-  }
-  lastOp.innerText = 'All images compressed ✅';
-});
-
-clearBtn.addEventListener('click', () => {
-  files.forEach(f => URL.revokeObjectURL(f.url));
-  files = [];
-  renderPreviews();
-  lastOp.innerText = 'Cleared';
-});
-
-downloadAllBtn.addEventListener('click', async () => {
-  if (!files.length) { alert('No files.'); return; }
-  const zip = new JSZip();
-  let any = false;
-  for (let i=0;i<files.length;i++){
-    const f = files[i];
-    if (f.compressedBlob) {
-      any = true;
-      const arr = await f.compressedBlob.arrayBuffer();
-      zip.file(makeFilename(f.file.name), arr);
+    function compressImage() {
+      if (!uploadedImage) {
+        alert("Please upload an image first!");
+        return;
+      }
+      const quality = document.getElementById('quality').value / 100;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = uploadedImage.width;
+      canvas.height = uploadedImage.height;
+      ctx.drawImage(uploadedImage, 0, 0);
+      canvas.toBlob(
+        (blob) => {
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = "compressed.jpg";
+          link.click();
+        },
+        "image/jpeg",
+        quality
+      );
     }
-  }
-  if (!any) { alert('No compressed files — compress first.'); return; }
-  lastOp.innerText = 'Creating ZIP...';
-  const content = await zip.generateAsync({type:"blob"}, meta => {
-    lastOp.innerText = `Zipping: ${Math.round(meta.percent)}%`;
-  });
-  downloadBlob(content, 'compressed-images.zip');
-  lastOp.innerText = 'ZIP ready ✅';
-});
+  </script>
 
-/* Single compress logic */
-async function compressSingle(idx){
-  const item = files[idx];
-  lastOp.innerText = `Compressing ${item.file.name}...`;
-  const format = formatEl.value;
-  const quality = Math.max(0.01, Math.min(1, qualityEl.value/100));
-  const maxW = parseInt(maxWidthEl.value) || 0;
-  const maxH = parseInt(maxHeightEl.value) || 0;
-
-  try {
-    const img = await loadImage(item.url);
-
-    // calculate resize preserving aspect ratio
-    let targetW = img.width, targetH = img.height;
-    if (maxW > 0 && targetW > maxW) {
-      const ratio = maxW / targetW;
-      targetW = Math.round(targetW * ratio);
-      targetH = Math.round(targetH * ratio);
-    }
-    if (maxH > 0 && targetH > maxH) {
-      const ratio = maxH / targetH;
-      targetW = Math.round(targetW * ratio);
-      targetH = Math.round(targetH * ratio);
-    }
-
-    // For very large images on mobile, downscale progressively to avoid memory spikes
-    const canvas = document.createElement('canvas');
-    canvas.width = targetW;
-    canvas.height = targetH;
-    const ctx = canvas.getContext('2d');
-
-    // fill white for formats that don't support alpha
-    if (format === 'image/png' && imgHasAlpha(item.file)) {
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-    } else {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-    }
-
-    // draw image scaled
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    // Convert to blob
-    const blob = await new Promise(resolve => {
-      // Use fallback quality for PNG (some browsers ignore)
-      canvas.toBlob(resolve, format, quality);
-      // If toBlob returns null (rare), fallback to dataURL
-      setTimeout(()=>{ if(!resolve.called) resolve(canvasToBlobFallback(canvas, format)); }, 1200);
-    });
-
-    item.compressedBlob = blob;
-    item.compressedSize = blob.size;
-    renderPreviews();
-    lastOp.innerText = `Compressed ${item.file.name} → ${(blob.size/1024).toFixed(1)} KB`;
-  } catch (err) {
-    console.error(err);
-    alert('Compression failed: ' + (err.message || err));
-    lastOp.innerText = 'Error during compression';
-  }
-}
-
-/* Helpers */
-function escapeHtml(s){ return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function loadImage(url) {
-  return new Promise((res, rej) => {
-    const img = new Image();
-    img.onload = () => res(img);
-    img.onerror = () => rej(new Error('Image load failed - maybe large or broken image'));
-    img.src = url;
-  });
-}
-function imgHasAlpha(file) {
-  const name = (file.name || '').toLowerCase();
-  return name.endsWith('.png');
-}
-function makeFilename(orig){
-  const base = orig.replace(/\.[^/.]+$/, '');
-  const ext = (formatEl.value === 'image/jpeg') ? 'jpg' : (formatEl.value === 'image/png' ? 'png' : 'webp');
-  return `${base}-${qualityEl.value}q.${ext}`;
-}
-function downloadBlob(blob, filename){
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=> {
-    URL.revokeObjectURL(a.href);
-    a.remove();
-  }, 5000);
-}
-
-// fallback to convert canvas to blob via dataURL
-function canvasToBlobFallback(canvas, type='image/png') {
-  const dataURL = canvas.toDataURL(type);
-  const byteString = atob(dataURL.split(',')[1]);
-  const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
-  for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-  return new Blob([ab], {type: mimeString});
-}
-
-window.addEventListener('beforeunload', () => {
-  try {
-    const opts = { format: formatEl.value, quality: qualityEl.value, maxW: maxWidthEl.value, maxH: maxHeightEl.value };
-    localStorage.setItem('imgcomp_opts', JSON.stringify(opts));
-  } catch(e){}
-});
-
-(function restoreOpts(){
-  try {
-    const raw = localStorage.getItem('imgcomp_opts');
-    if (!raw) return;
-    const o = JSON.parse(raw);
-    if (o.format) formatEl.value = o.format;
-    if (o.quality) { qualityEl.value = o.quality; qLabel.innerText = o.quality + '%'; }
-    if (o.maxW) maxWidthEl.value = o.maxW;
-    if (o.maxH) maxHeightEl.value = o.maxH;
-  } catch(e){}
-})();
-
-window.addEventListener('unload', () => { files.forEach(f => URL.revokeObjectURL(f.url)); });
-
-</script>
 </body>
 </html>
