@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HEX to RGB Converter | Convert HEX Colors to RGB Online</title>
+<meta name="description" content="Convert HEX colors to RGB instantly with our free HEX to RGB converter tool. Mobile-friendly and responsive color converter.">
+<meta name="keywords" content="HEX to RGB, HEX Color Converter, Convert HEX to RGB Online, Free HEX RGB Tool, Color Converter">
+<meta name="robots" content="index, follow">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0d6efd, #ffffff);
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+  }
+  h1, h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  .container {
+    background: #fff;
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: left;
+  }
+  input, button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 2px solid #0d6efd;
+    font-size: 16px;
+  }
+  button {
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #0b5ed7;
+  }
+  #result {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    word-wrap: break-word;
+  }
+  .ads {
+    margin: 15px 0;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎨 HEX to RGB Converter</h1>
+<h2>Convert HEX colors to RGB online</h2>
+
+<!-- 🔹 Top Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {
+    'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+</div>
+
+<div class="container">
+  <input type="text" id="hexInput" placeholder="Enter HEX color (#RRGGBB)">
+  <button onclick="convertHEXtoRGB()">Convert</button>
+  <div id="result">RGB: rgb(0,0,0)</div>
+</div>
+
+<!-- 🔹 Middle Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {
+    'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+</div>
+
+<!-- 🔹 Bottom Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {
+    'key' : '496188380e746eef901d9058c8f77c85',
+    'format' : 'iframe',
+    'height' : 60,
+    'width' : 468,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+</div>
+
+<script>
+function convertHEXtoRGB() {
+  const hex = document.getElementById("hexInput").value.trim();
+  const resultDiv = document.getElementById("result");
+
+  const validHex = /^#?([a-fA-F0-9]{6})$/;
+  if(!validHex.test(hex)){
+    resultDiv.innerHTML = "❌ Invalid HEX color! Use format #RRGGBB";
+    return;
+  }
+
+  const cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
+  const r = parseInt(cleanHex.slice(0,2),16);
+  const g = parseInt(cleanHex.slice(2,4),16);
+  const b = parseInt(cleanHex.slice(4,6),16);
+
+  resultDiv.innerHTML = `✅ RGB: rgb(${r}, ${g}, ${b})`;
+}
+</script>
+
+</body>
+</html>
