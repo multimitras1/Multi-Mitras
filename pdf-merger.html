@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>PDF Merger & Splitter — KathaByte Tools</title>
+
+<!-- pdf-lib for client-side PDF manipulation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<style>
+:root{
+  --blue-deep:#0d47a1; --blue-mid:#1976d2; --accent:#00c3ff;
+  --card-radius:12px; --maxw:1100px; --text-dark:#042a4a;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:
+  radial-gradient(1200px 600px at 10% 10%, rgba(0,195,255,0.06), transparent),
+  linear-gradient(135deg,#eaf6ff 0%, #ffffff 60%); color:var(--text-dark); -webkit-font-smoothing:antialiased;}
+.page{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:20px;}
+.container{width:100%;max-width:var(--maxw);display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.92));border-radius:var(--card-radius);padding:16px;box-shadow:0 10px 30px rgba(3,54,120,0.06);border:1px solid rgba(13,71,161,0.06);}
+header.card{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+h1{margin:0;font-size:18px;color:var(--blue-deep);display:flex;align-items:center;gap:10px}
+.lead{margin:6px 0 0;color:#0b4b72;font-size:13px}
+.controls{display:grid;gap:10px;margin-top:12px}
+input[type=file], input[type=text], select, button, textarea { width:100%; padding:10px;border-radius:8px;border:1px solid rgba(13,71,161,0.06);font-size:14px;background:#fff; }
+.small{font-size:13px;color:#0b4b72}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+button.primary{background:linear-gradient(90deg,var(--accent),var(--blue-mid));color:#fff;border:none;cursor:pointer;padding:10px;border-radius:8px;font-weight:700}
+button.ghost{background:#fff;border:1px solid rgba(13,71,161,0.06);color:var(--blue-deep);padding:10px;border-radius:8px;cursor:pointer}
+.progress{margin-top:8px;font-size:13px;color:#0b4b72}
+.output{white-space:pre-wrap;background:#f7fbff;border-radius:8px;padding:12px;border:1px solid rgba(13,71,161,0.04);max-height:300px;overflow:auto}
+.file-list{max-height:220px;overflow:auto;padding:8px;border-radius:8px;background:#fff;border:1px solid rgba(13,71,161,0.04)}
+.file-item{display:flex;justify-content:space-between;align-items:center;padding:6px 4px;border-bottom:1px dashed rgba(13,71,161,0.03);font-size:13px}
+.sidebar{display:flex;flex-direction:column;gap:12px}
+.ad-slot{text-align:center}
+footer.card{grid-column:1/-1;text-align:center;font-size:12px;color:#0b4b72}
+
+/* Responsive rules */
+@media(max-width:980px){ .container{grid-template-columns:1fr} .sidebar{order:-1} }
+@media(max-width:420px){ h1{font-size:16px} button.primary, button.ghost{padding:12px;font-size:15px} }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="container" role="main" aria-label="PDF Merger and Splitter Tool">
+
+    <!-- Header + Top ad -->
+    <header class="card" role="banner">
+      <div>
+        <h1>🔗 Merge & ✂️ Split — PDF Tool</h1>
+        <div class="lead">Merge multiple PDFs or split a PDF into pages / ranges. Client-side, no server upload required.</div>
+      </div>
+      <div id="topAd" style="min-width:220px;text-align:right"></div>
+    </header>
+
+    <!-- Main tool card -->
+    <section class="card" aria-labelledby="toolTitle">
+      <div id="toolTitle" style="font-weight:700;color:var(--blue-deep)">PDF Merger</div>
+
+      <div class="controls">
+        <label class="small">Select PDFs to merge (multiple)</label>
+        <input id="mergeInput" type="file" accept="application/pdf" multiple aria-label="Select PDFs to merge">
+        <div style="display:flex;gap:8px;">
+          <button class="primary" id="mergeBtn">Merge PDFs</button>
+          <button class="ghost" id="clearMergeBtn">Clear</button>
+        </div>
+
+        <div class="small" style="margin-top:8px">Selected files:</div>
+        <div id="mergeFileList" class="file-list"><div class="small" style="opacity:.7">No files selected</div></div>
+        <div id="mergeStatus" class="progress">—</div>
+      </div>
+
+      <hr style="margin:14px 0;border:none;border-top:1px solid rgba(13,71,161,0.06)">
+
+      <div style="font-weight:700;color:var(--blue-deep);margin-top:8px">PDF Splitter</div>
+      <div class="controls">
+        <label class="small">Select PDF to split</label>
+        <input id="splitInput" type="file" accept="application/pdf" aria-label="Select PDF to split">
+        <label class="small">Page ranges (e.g. <code>1-3,5</code>) or enter <code>all</code> to split into single pages</label>
+        <input id="splitRanges" type="text" placeholder="e.g. 1-3,5  OR  all" aria-label="Page ranges">
+        <div style="display:flex;gap:8px;">
+          <button class="primary" id="splitBtn">Split PDF</button>
+          <button class="ghost" id="clearSplitBtn">Clear</button>
+        </div>
+
+        <div class="small" style="margin-top:8px">File info:</div>
+        <div id="splitFileInfo" class="small">No file selected</div>
+        <div id="splitStatus" class="progress">—</div>
+      </div>
+
+      <!-- mid ad -->
+      <div id="midAd" style="margin-top:12px;text-align:center"></div>
+    </section>
+
+    <!-- Sidebar -->
+    <aside class="card sidebar" aria-label="Actions and ads">
+      <div>
+        <strong class="small">Last operation</strong>
+        <div id="lastOp" class="small">—</div>
+      </div>
+
+      <div>
+        <strong class="small">Quick help</strong>
+        <div class="small" style="color:#0b4b72;margin-top:6px">
+          • Merge: select multiple PDFs and click Merge.<br>
+          • Split: select a single PDF and enter ranges (or 'all' to split every page).
+        </div>
+      </div>
+
+      <div id="sideAd" class="ad-slot" aria-hidden></div>
+      <div id="bottomAd" class="ad-slot" aria-hidden></div>
+    </aside>
+
+    <footer class="card" role="contentinfo">
+      Note: Very large PDFs may be slow on mobile devices. For enterprise-grade merging/splitting consider a server-side solution.
+    </footer>
+
+  </div>
+</div>
+
+<script>
+/* ---------- Responsive ads injection (user-provided ad scripts) ---------- */
+function injectInline(parent, code){ const s=document.createElement('script'); s.type='text/javascript'; s.innerHTML = code; parent.appendChild(s); }
+function injectSrc(parent, id, src){ if(document.getElementById(id)) return; const s=document.createElement('script'); s.id=id; s.type='text/javascript'; s.src = src; parent.appendChild(s); }
+
+function loadAdsResponsive(){
+  const w = window.innerWidth || document.documentElement.clientWidth;
+  const topAd = document.getElementById('topAd');
+  const midAd = document.getElementById('midAd');
+  const sideAd = document.getElementById('sideAd');
+  const bottomAd = document.getElementById('bottomAd');
+  [topAd,midAd,sideAd,bottomAd].forEach(el=>el && (el.innerHTML=''));
+
+  if(w >= 900){
+    // Desktop
+    injectInline(topAd, "atOptions = {'key':'a4236a38fef8b51c08a860f7e29b1a32','format':'iframe','height':90,'width':728,'params':{}};");
+    injectSrc(topAd,'ad728','//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js');
+
+    injectInline(midAd, "atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};");
+    injectSrc(midAd,'ad300','//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js');
+
+    injectInline(sideAd, "atOptions = {'key':'962ff242b01ed125eb9b14423f7dbd3f','format':'iframe','height':300,'width':160,'params':{}};");
+    injectSrc(sideAd,'ad160','//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js');
+
+    injectInline(bottomAd, "atOptions = {'key':'496188380e746eef901d9058c8f77c85','format':'iframe','height':60,'width':468,'params':{}};");
+    injectSrc(bottomAd,'ad468','//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js');
+  } else {
+    // Mobile
+    injectInline(topAd, "atOptions = {'key':'e38b91a0e0dc32981096ab740b4d4a67','format':'iframe','height':50,'width':320,'params':{}};");
+    injectSrc(topAd,'ad320_top','//lightingshovestature.com/e38b91a0e0dc32981096ab740b4d4a67/invoke.js');
+
+    injectInline(midAd, "atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};");
+    injectSrc(midAd,'ad300_mobile','//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js');
+
+    injectInline(bottomAd, "atOptions = {'key':'e38b91a0e0dc32981096ab740b4d4a67','format':'iframe','height':50,'width':320,'params':{}};");
+    injectSrc(bottomAd,'ad320_bottom','//lightingshovestature.com/e38b91a0e0dc32981096ab740b4d4a67/invoke.js');
+  }
+}
+loadAdsResponsive();
+window.addEventListener('resize', ()=>{ clearTimeout(window._adResize); window._adResize=setTimeout(loadAdsResponsive,400); });
+window.addEventListener('orientationchange', ()=>setTimeout(loadAdsResponsive,600));
+
+/* ---------- Helper utils ---------- */
+function escapeHtml(s){ return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function downloadBlob(blob, filename){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },5000); }
+
+/* ---------- Merge logic ---------- */
+const mergeInput = document.getElementById('mergeInput');
+const mergeBtn = document.getElementById('mergeBtn');
+const mergeFileList = document.getElementById('mergeFileList');
+const mergeStatus = document.getElementById('mergeStatus');
+const clearMergeBtn = document.getElementById('clearMergeBtn');
+const lastOp = document.getElementById('lastOp');
+
+let mergeFiles = [];
+
+mergeInput.addEventListener('change', (e) => {
+  mergeFiles = Array.from(e.target.files || []);
+  renderMergeList();
+});
+
+function renderMergeList(){
+  mergeFileList.innerHTML = '';
+  if(!mergeFiles.length){ mergeFileList.innerHTML = '<div class="small" style="opacity:.7">No files selected</div>'; return; }
+  mergeFiles.forEach((f, i)=>{
+    const div = document.createElement('div');
+    div.className = 'file-item';
+    div.innerHTML = `<div title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div><div style="font-size:12px;color:#0b4b72">${(f.size/1024).toFixed(1)} KB</div>`;
+    mergeFileList.appendChild(div);
+  });
+}
+
+clearMergeBtn.addEventListener('click', ()=>{
+  mergeFiles = [];
+  mergeInput.value = '';
+  renderMergeList();
+  mergeStatus.innerText = 'Cleared';
+});
+
+/* Merge PDFs using pdf-lib */
+mergeBtn.addEventListener('click', async ()=>{
+  if(!mergeFiles.length){ alert('Select PDFs to merge'); return; }
+  mergeStatus.innerText = 'Merging...';
+  lastOp.innerText = 'Merging PDFs';
+  try {
+    const mergedPdf = await PDFLib.PDFDocument.create();
+    for(let i=0;i<mergeFiles.length;i++){
+      const file = mergeFiles[i];
+      mergeStatus.innerText = `Loading (${i+1}/${mergeFiles.length}): ${file.name}`;
+      const arrayBuffer = await file.arrayBuffer();
+      const srcDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+      const srcPages = await mergedPdf.copyPages(srcDoc, srcDoc.getPageIndices());
+      srcPages.forEach((p) => mergedPdf.addPage(p));
+    }
+    mergeStatus.innerText = 'Saving merged PDF...';
+    const mergedBytes = await mergedPdf.save();
+    const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+    downloadBlob(blob, `merged_${Date.now()}.pdf`);
+    mergeStatus.innerText = 'Merge complete ✅';
+    lastOp.innerText = `Merged ${mergeFiles.length} files`;
+  } catch (err) {
+    console.error(err);
+    mergeStatus.innerText = 'Merge failed';
+    alert('Merge failed: ' + (err.message || err));
+  }
+});
+
+/* ---------- Split logic ---------- */
+const splitInput = document.getElementById('splitInput');
+const splitRanges = document.getElementById('splitRanges');
+const splitBtn = document.getElementById('splitBtn');
+const splitStatus = document.getElementById('splitStatus');
+const clearSplitBtn = document.getElementById('clearSplitBtn');
+const splitFileInfo = document.getElementById('splitFileInfo');
+
+let splitFile = null;
+let loadedSplitPdf = null;
+
+splitInput.addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  if(!f) return;
+  splitFile = f;
+  splitFileInfo.innerText = `${f.name} · ${(f.size/1024).toFixed(1)} KB`;
+  splitStatus.innerText = 'Loading PDF...';
+  loadedSplitPdf = null;
+  try{
+    const array = await f.arrayBuffer();
+    const loaded = await PDFLib.PDFDocument.load(array);
+    loadedSplitPdf = loaded;
+    splitStatus.innerText = `Loaded — ${loaded.getPageCount()} pages`;
+  }catch(err){
+    console.error(err);
+    splitStatus.innerText = 'Failed to load PDF';
+    alert('Could not load PDF (possibly corrupt or too large).');
+  }
+});
+
+clearSplitBtn.addEventListener('click', ()=>{
+  splitInput.value = '';
+  splitFile = null;
+  loadedSplitPdf = null;
+  splitFileInfo.innerText = 'No file selected';
+  splitStatus.innerText = 'Cleared';
+});
+
+/* parse page ranges like "1-3,5" or "all" */
+function parseRanges(str, total){
+  if(!str || /^\s*all\s*$/i.test(str)) return { mode:'all' };
+  const parts = str.split(',').map(p=>p.trim()).filter(Boolean);
+  const pages = new Set();
+  for(const p of parts){
+    if(/^\d+\-\d+$/.test(p)){
+      const [a,b]=p.split('-').map(Number);
+      for(let i=Math.max(1,a); i<=Math.min(total,b); i++) pages.add(i-1); // zero-index
+    } else if(/^\d+$/.test(p)){
+      const n = Number(p);
+      if(n>=1 && n<=total) pages.add(n-1);
+    }
+  }
+  return { mode:'pages', pages:Array.from(pages).sort((a,b)=>a-b) };
+}
+
+splitBtn.addEventListener('click', async ()=>{
+  if(!loadedSplitPdf || !splitFile){ alert('Select a PDF to split'); return; }
+  const total = loadedSplitPdf.getPageCount();
+  const spec = parseRanges(splitRanges.value.trim(), total);
+  splitStatus.innerText = 'Preparing split...';
+  lastOp.innerText = 'Splitting PDF';
+  try{
+    if(spec.mode === 'all'){
+      // produce individual pages
+      for(let i=0;i<total;i++){
+        splitStatus.innerText = `Extracting page ${i+1}/${total}...`;
+        const newDoc = await PDFLib.PDFDocument.create();
+        const [p] = await newDoc.copyPages(loadedSplitPdf, [i]);
+        newDoc.addPage(p);
+        const bytes = await newDoc.save();
+        downloadBlob(new Blob([bytes], {type:'application/pdf'}), `${splitFile.name.replace(/\.pdf$/i,'')}_page_${i+1}.pdf`);
+        // small yield
+        await new Promise(res=>setTimeout(res,100));
+      }
+      splitStatus.innerText = `Split into ${total} pages complete ✅`;
+    } else {
+      const pages = spec.pages;
+      if(!pages.length){ alert('No valid pages found for that range'); splitStatus.innerText = 'No pages to split'; return; }
+      // Create a single PDF containing specified pages
+      const outDoc = await PDFLib.PDFDocument.create();
+      const copied = await outDoc.copyPages(loadedSplitPdf, pages);
+      copied.forEach(p=>outDoc.addPage(p));
+      const outBytes = await outDoc.save();
+      downloadBlob(new Blob([outBytes], {type:'application/pdf'}), `${splitFile.name.replace(/\.pdf$/i,'')}_extract_${Date.now()}.pdf`);
+      splitStatus.innerText = `Extracted ${pages.length} page(s) ✅`;
+    }
+  }catch(err){
+    console.error(err);
+    splitStatus.innerText = 'Split failed';
+    alert('Split failed: ' + (err.message || err));
+  }
+});
+
+/* Accessibility helpers */
+document.querySelectorAll('input[type=file]').forEach(inp=>{
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') inp.click(); });
+});
+
+/* Cleanup object URLs on unload */
+window.addEventListener('unload', ()=>{ /* nothing to revoke here as we stream downloads */ });
+
+</script>
+</body>
+</html>
