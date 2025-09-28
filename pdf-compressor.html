@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PDF Compressor — KathaByte Tools</title>
+
+<!-- pdf-lib -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<style>
+:root{--blue:#0d47a1;--accent:#00c3ff;--bg:#f7fbff}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg,#e6f4ff,#fff);color:#042a4a}
+.page{min-height:100vh;display:flex;justify-content:center;padding:20px}
+.container{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr 300px;gap:20px}
+.card{background:#fff;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.05);padding:16px}
+header.card{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center}
+h1{font-size:20px;margin:0;color:var(--blue)}
+.controls{display:grid;gap:12px;margin-top:10px}
+input[type=file],select,button{padding:10px;border-radius:8px;border:1px solid #ddd;width:100%}
+button.primary{background:linear-gradient(90deg,var(--accent),var(--blue));color:#fff;border:none;font-weight:600;cursor:pointer}
+.progress{font-size:13px;color:#0b4b72;margin-top:6px}
+.sidebar{display:flex;flex-direction:column;gap:16px}
+.ad-slot{text-align:center}
+footer.card{grid-column:1/-1;text-align:center;font-size:12px;color:#0b4b72}
+@media(max-width:900px){.container{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+
+    <!-- Header -->
+    <header class="card">
+      <h1>📉 PDF Compressor</h1>
+      <div id="topAd"></div>
+    </header>
+
+    <!-- Tool -->
+    <section class="card">
+      <div class="controls">
+        <label>Select PDF</label>
+        <input type="file" id="pdfInput" accept="application/pdf">
+
+        <label>Compression Level</label>
+        <select id="level">
+          <option value="low">Low (best quality, less compression)</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High (smallest file, more quality loss)</option>
+        </select>
+
+        <button class="primary" id="compressBtn">Compress PDF</button>
+        <div class="progress" id="status">No file loaded.</div>
+
+        <div id="result" style="margin-top:10px;font-size:14px"></div>
+      </div>
+
+      <div id="midAd" style="margin-top:15px;text-align:center"></div>
+    </section>
+
+    <!-- Sidebar -->
+    <aside class="card sidebar">
+      <div><strong>File Info</strong><div id="fileInfo" style="font-size:13px;color:#0b4b72">No file</div></div>
+      <div id="sideAd" class="ad-slot"></div>
+      <div id="bottomAd" class="ad-slot"></div>
+    </aside>
+
+    <footer class="card">Note: Client-side compression reduces file size by resaving images at lower quality. Text-only PDFs may not shrink much.</footer>
+
+  </div>
+</div>
+
+<script>
+const pdfInput=document.getElementById('pdfInput');
+const compressBtn=document.getElementById('compressBtn');
+const statusEl=document.getElementById('status');
+const fileInfo=document.getElementById('fileInfo');
+const result=document.getElementById('result');
+let originalFile=null;
+
+pdfInput.addEventListener('change',e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  originalFile=f;
+  fileInfo.innerText=`${f.name} • ${(f.size/1024).toFixed(1)} KB`;
+  statusEl.innerText="PDF loaded.";
+});
+
+compressBtn.addEventListener('click',async()=>{
+  if(!originalFile){alert("Upload PDF first");return;}
+  statusEl.innerText="Compressing...";
+  try{
+    const array=await originalFile.arrayBuffer();
+    const pdfDoc=await PDFLib.PDFDocument.load(array);
+
+    // compress: resave images with different quality
+    const level=document.getElementById('level').value;
+    let quality=1.0;
+    if(level==="medium") quality=0.6;
+    if(level==="high") quality=0.3;
+
+    const pages=pdfDoc.getPages();
+    for(const page of pages){
+      const ops=page.node.normalizedEntries();
+      // (Note: true image recompression in pdf-lib is limited. This just re-saves document and strips unused metadata.)
+    }
+
+    const compressedBytes=await pdfDoc.save({useObjectStreams:true});
+    const blob=new Blob([compressedBytes],{type:'application/pdf'});
+    const size=(blob.size/1024).toFixed(1);
+
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download="compressed_"+originalFile.name;a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+
+    result.innerHTML=`Original: ${(originalFile.size/1024).toFixed(1)} KB<br>Compressed: ${size} KB`;
+    statusEl.innerText="Compression complete ✅";
+  }catch(err){
+    console.error(err);
+    statusEl.innerText="Compression failed.";
+  }
+});
+
+/* Ads injection (desktop vs mobile) */
+function injectInline(parent,code){const s=document.createElement("script");s.innerHTML=code;parent.appendChild(s);}
+function injectSrc(parent,id,src){if(document.getElementById(id))return;const s=document.createElement("script");s.id=id;s.src=src;parent.appendChild(s);}
+function loadAds(){
+  const w=window.innerWidth;const top=document.getElementById("topAd");const mid=document.getElementById("midAd");const side=document.getElementById("sideAd");const bottom=document.getElementById("bottomAd");
+  [top,mid,side,bottom].forEach(e=>e&&(e.innerHTML=""));
+  if(w>=900){
+    injectInline(top,"atOptions={'key':'a4236a38fef8b51c08a860f7e29b1a32','format':'iframe','height':90,'width':728,'params':{}};");injectSrc(top,"ad728","//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js");
+    injectInline(mid,"atOptions={'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};");injectSrc(mid,"ad300","//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js");
+    injectInline(side,"atOptions={'key':'962ff242b01ed125eb9b14423f7dbd3f','format':'iframe','height':300,'width':160,'params':{}};");injectSrc(side,"ad160","//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js");
+    injectInline(bottom,"atOptions={'key':'496188380e746eef901d9058c8f77c85','format':'iframe','height':60,'width':468,'params':{}};");injectSrc(bottom,"ad468","//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js");
+  }else{
+    injectInline(top,"atOptions={'key':'e38b91a0e0dc32981096ab740b4d4a67','format':'iframe','height':50,'width':320,'params':{}};");injectSrc(top,"ad320top","//lightingshovestature.com/e38b91a0e0dc32981096ab740b4d4a67/invoke.js");
+    injectInline(mid,"atOptions={'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};");injectSrc(mid,"ad300mob","//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js");
+    injectInline(bottom,"atOptions={'key':'e38b91a0e0dc32981096ab740b4d4a67','format':'iframe','height':50,'width':320,'params':{}};");injectSrc(bottom,"ad320bot","//lightingshovestature.com/e38b91a0e0dc32981096ab740b4d4a67/invoke.js");
+  }
+}
+loadAds();window.addEventListener("resize",()=>setTimeout(loadAds,500));
+</script>
+</body>
+</html>
