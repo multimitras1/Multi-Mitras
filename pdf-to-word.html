@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>PDF → Word (.docx) Converter — KathaByte Tools</title>
+
+<!-- pdf.js (for text extraction) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<!-- docx (to create .docx files) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.2.1/docx.umd.min.js"></script>
+
+<style>
+:root{
+  --blue-deep:#0d47a1; --blue-mid:#1976d2; --accent:#00c3ff;
+  --card-radius:12px; --maxw:1100px; --text-dark:#042a4a;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;background:
+  radial-gradient(1200px 600px at 10% 10%, rgba(0,195,255,0.06), transparent),
+  linear-gradient(135deg,#e6f4ff 0%, #ffffff 60%); color:var(--text-dark); -webkit-font-smoothing:antialiased;}
+.page{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:20px;}
+.container{width:100%;max-width:var(--maxw);display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.92));border-radius:var(--card-radius);padding:16px;box-shadow:0 10px 30px rgba(3,54,120,0.06);border:1px solid rgba(13,71,161,0.06);}
+header.card{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+h1{margin:0;font-size:18px;color:var(--blue-deep);display:flex;align-items:center;gap:10px}
+.lead{margin:6px 0 0;color:#0b4b72;font-size:13px}
+.controls{display:grid;gap:10px;margin-top:12px}
+input[type=file], input[type=text], select, button, textarea { width:100%; padding:10px;border-radius:8px;border:1px solid rgba(13,71,161,0.06);font-size:14px;background:#fff; }
+.small{font-size:13px;color:#0b4b72}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+button.primary{background:linear-gradient(90deg,var(--accent),var(--blue-mid));color:#fff;border:none;cursor:pointer;padding:10px;border-radius:8px;font-weight:700}
+button.ghost{background:#fff;border:1px solid rgba(13,71,161,0.06);color:var(--blue-deep);padding:10px;border-radius:8px;cursor:pointer}
+.progress{margin-top:8px;font-size:13px;color:#0b4b72}
+.output{white-space:pre-wrap;background:#f7fbff;border-radius:8px;padding:12px;border:1px solid rgba(13,71,161,0.04);max-height:300px;overflow:auto}
+.sidebar{display:flex;flex-direction:column;gap:12px}
+.ad-slot{text-align:center}
+footer.card{grid-column:1/-1;text-align:center;font-size:12px;color:#0b4b72}
+
+/* Responsive */
+@media(max-width:980px){ .container{grid-template-columns:1fr} .sidebar{order:-1} }
+@media(max-width:420px){ h1{font-size:16px} button.primary, button.ghost{padding:12px;font-size:15px} }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="container" role="main" aria-label="PDF to Word Converter">
+
+    <!-- Header + Top ad placeholder -->
+    <header class="card" role="banner">
+      <div>
+        <h1>📄 → 📝 PDF to Word Converter</h1>
+        <div class="lead">Extract text from PDF and generate a .docx file in the browser. (Client-side)</div>
+      </div>
+
+      <!-- topAd will be injected responsively -->
+      <div id="topAd" style="min-width:220px;text-align:right"></div>
+    </header>
+
+    <!-- Main tool card -->
+    <section class="card" aria-labelledby="toolTitle">
+      <div id="toolTitle" style="font-weight:700;color:var(--blue-deep)">Convert PDF to Word (.docx)</div>
+
+      <div class="controls">
+        <label class="small">Select PDF file</label>
+        <input id="pdfInput" type="file" accept="application/pdf" aria-label="Upload PDF">
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="flex:1">
+            <label class="small">Pages to convert</label>
+            <input id="pagesRange" type="text" placeholder="e.g. all  OR  1-3,5" aria-label="Pages to convert">
+            <div class="small" style="margin-top:6px;color:#0b4b72">Use "all" (default) or comma-separated pages/ranges like <code>1-3,5</code>.</div>
+          </div>
+        </div>
+
+        <label class="small">Options</label>
+        <div class="row">
+          <select id="langHint" aria-label="Language hint">
+            <option value="en">English (default)</option>
+            <option value="auto">Auto-detect</option>
+          </select>
+          <button class="ghost" id="extractBtn">Extract & Preview</button>
+        </div>
+
+        <div class="progress" id="status">No file loaded.</div>
+
+        <div style="margin-top:10px">
+          <label class="small">Preview Extracted Text</label>
+          <div id="previewText" class="output">—</div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <button class="primary" id="exportBtn" disabled>Export as .docx</button>
+          <button class="ghost" id="clearBtn">Clear</button>
+        </div>
+
+        <div class="small" style="margin-top:12px;color:#0b4b72">
+          Note: Client-side extraction works best for text-based PDFs. Complex layout (tables, multi-columns, images) may not be preserved. For higher fidelity use server/API conversion.
+        </div>
+      </div>
+
+      <!-- mid ad placeholder -->
+      <div id="midAd" style="margin-top:12px;text-align:center"></div>
+    </section>
+
+    <!-- Sidebar with ads / extras -->
+    <aside class="card sidebar" aria-label="Ads and info">
+      <div>
+        <strong class="small">File Info</strong>
+        <div id="fileInfo" class="small">No file selected</div>
+      </div>
+
+      <div>
+        <strong class="small">Actions</strong>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="ghost" id="downloadRawBtn" disabled>Download TXT</button>
+          <button class="ghost" id="copyBtn" disabled>Copy Text</button>
+        </div>
+      </div>
+
+      <!-- side ad placeholder -->
+      <div id="sideAd" class="ad-slot" aria-hidden></div>
+
+      <!-- bottom small banner placeholder -->
+      <div id="bottomAd" class="ad-slot" aria-hidden></div>
+    </aside>
+
+    <footer class="card" role="contentinfo">
+      Tip: For multi-page PDFs you can extract a subset by entering a page range (e.g. <code>2-4,6</code>).
+    </footer>
+
+  </div>
+</div>
+
+<script>
+/* --------- Responsive ad injection (uses user-provided scripts) --------- */
+function injectInline(parent, code){ const s=document.createElement('script'); s.type='text/javascript'; s.innerHTML=code; parent.appendChild(s); }
+function injectSrc(parent, id, src){ if(document.getElementById(id)) return; const s=document.createElement('script'); s.id=id; s.type='text/javascript'; s.src=src; parent.appendChild(s); }
+
+function loadAdsResponsive(){
+  const w = window.innerWidth || document.documentElement.clientWidth;
+  const topAd = document.getElementById('topAd');
+  const midAd = document.getElementById('midAd');
+  const sideAd = document.getElementById('sideAd');
+  const bottomAd = document.getElementById('bottomAd');
+  [topAd, midAd, sideAd, bottomAd].forEach(el=>el && (el.innerHTML=''));
+
+  if(w >= 900){
+    // Desktop: 728x90 top, 300x250 mid, 160x300 side, 468x60 bottom
+    injectInline(topAd, "atOptions = {'key':'a4236a38fef8b51c08a860f7e29b1a32','format':'iframe','height':90,'width':728,'params':{}};");
+    injectSrc(topAd,'ad728','//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js');
+
+    injectInline(midAd,"atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};");
+    injectSrc(midAd,'ad300','//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js');
+
+    injectInline(sideAd,"atOptions = {'key':'962ff242b01ed125eb9b14423f7dbd3f','format':'iframe','height':300,'width':160,'params':{}};");
+    injectSrc(sideAd,'ad160','//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js');
+
+    injectInline(bottomAd,"atOptions = {'key':'496188380e746eef901d9058c8f77c85','format':'iframe','height':60,'width':468,'params':{}};");
+    injectSrc(bottomAd,'ad468','//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js');
+
+  } else {
+    // Mobile: 320x50 top & bottom, 300x250 mid
+    injectInline(topAd,"atOptions = {'key':'e38b91a0e0dc32981096ab740b4d4a67','format':'iframe','height':50,'width':320,'params':{}};");
+    injectSrc(topAd,'ad320_top','//lightingshovestature.com/e38b91a0e0dc32981096ab740b4d4a67/invoke.js');
+
+    injectInline(midAd,"atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};");
+    injectSrc(midAd,'ad300_mobile','//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js');
+
+    injectInline(bottomAd,"atOptions = {'key':'e38b91a0e0dc32981096ab740b4d4a67','format':'iframe','height':50,'width':320,'params':{}};");
+    injectSrc(bottomAd,'ad320_bottom','//lightingshovestature.com/e38b91a0e0dc32981096ab740b4d4a67/invoke.js');
+  }
+}
+loadAdsResponsive();
+window.addEventListener('resize', ()=>{ clearTimeout(window._adResize); window._adResize=setTimeout(loadAdsResponsive,400); });
+window.addEventListener('orientationchange', ()=>setTimeout(loadAdsResponsive,600));
+
+/* ---------------- PDF -> TEXT -> DOCX logic ---------------- */
+const pdfInput = document.getElementById('pdfInput');
+const pagesRange = document.getElementById('pagesRange');
+const extractBtn = document.getElementById('extractBtn');
+const exportBtn = document.getElementById('exportBtn');
+const statusEl = document.getElementById('status');
+const previewText = document.getElementById('previewText');
+const fileInfo = document.getElementById('fileInfo');
+const clearBtn = document.getElementById('clearBtn');
+const downloadRawBtn = document.getElementById('downloadRawBtn');
+const copyBtn = document.getElementById('copyBtn');
+
+let loadedPdf = null;
+let extractedText = '';
+let pdfFileName = '';
+
+pdfInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  pdfFileName = file.name.replace(/\.pdf$/i,'') || 'document';
+  fileInfo.innerText = `${file.name} · ${(file.size/1024).toFixed(1)} KB`;
+  statusEl.innerText = 'Loading PDF...';
+  previewText.innerText = '—';
+  extractedText = '';
+  exportBtn.disabled = true;
+  downloadRawBtn.disabled = true;
+  copyBtn.disabled = true;
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const loadingTask = pdfjsLib.getDocument({data: arrayBuffer});
+    loadedPdf = await loadingTask.promise;
+    statusEl.innerText = `Loaded PDF — ${loadedPdf.numPages} pages`;
+  } catch(err){
+    console.error(err);
+    statusEl.innerText = 'Failed to load PDF';
+    alert('Unable to read PDF (possibly corrupt or too large).');
+  }
+});
+
+function parsePagesString(str, total){
+  if(!str || /^\s*all\s*$/i.test(str)) return Array.from({length: total}, (_,i)=>i+1);
+  const parts = str.split(',').map(s=>s.trim()).filter(Boolean);
+  const pages = new Set();
+  parts.forEach(p=>{
+    if(/^\d+\-\d+$/.test(p)){
+      const [a,b]=p.split('-').map(Number);
+      for(let i=Math.max(1,a); i<=Math.min(total,b); i++) pages.add(i);
+    } else if(/^\d+$/.test(p)){
+      const n=Number(p); if(n>=1 && n<=total) pages.add(n);
+    }
+  });
+  return Array.from(pages).sort((a,b)=>a-b);
+}
+
+extractBtn.addEventListener('click', async ()=>{
+  if(!loadedPdf){ alert('Please upload a PDF first'); return; }
+  const total = loadedPdf.numPages;
+  const pageSpec = pagesRange.value.trim() || 'all';
+  const pages = parsePagesString(pageSpec, total);
+  if(!pages.length){ alert('No valid pages selected'); return; }
+
+  statusEl.innerText = `Extracting text from ${pages.length} page(s)...`;
+  extractedText = '';
+  previewText.innerText = 'Processing...';
+  // loop pages and extract text
+  for(let i=0;i<pages.length;i++){
+    const pnum = pages[i];
+    statusEl.innerText = `Extracting page ${pnum} (${i+1}/${pages.length})...`;
+    try{
+      const page = await loadedPdf.getPage(pnum);
+      const content = await page.getTextContent();
+      // assemble page text
+      const strings = content.items.map(it => it.str);
+      const pageText = strings.join(' ');
+      extractedText += `\n\n--- Page ${pnum} ---\n\n` + pageText;
+      // small delay yield for UI
+      await new Promise(res=>setTimeout(res,50));
+    }catch(err){
+      console.error('page extract failed', pnum, err);
+      extractedText += `\n\n--- Page ${pnum} (error extracting) ---\n\n`;
+    }
+  }
+  previewText.innerText = extractedText.trim() || '(no text found)';
+  statusEl.innerText = `Extraction complete — ${pages.length} page(s) processed.`;
+  exportBtn.disabled = false;
+  downloadRawBtn.disabled = false;
+  copyBtn.disabled = false;
+});
+
+exportBtn.addEventListener('click', async ()=>{
+  if(!extractedText.trim()){ alert('No extracted text to export. Run Extract first.'); return; }
+  statusEl.innerText = 'Generating .docx file...';
+
+  try {
+    // docx generation using docx. Create paragraphs per line / page separation.
+    const { Document, Packer, Paragraph, TextRun } = docx;
+
+    const doc = new Document({ sections: [{ properties: {}, children: [] }] });
+    // Simple conversion: split into lines and create paragraphs.
+    const lines = extractedText.trim().split(/\r?\n/);
+    lines.forEach(line=>{
+      const trimmed = line.replace(/^\s+|\s+$/g,'');
+      if(trimmed.length===0){
+        // blank paragraph
+        doc.addSection({ children: [ new Paragraph('') ] });
+      } else {
+        // create paragraph (you can enhance: bold headings, etc.)
+        const para = new Paragraph({ children: [ new TextRun(trimmed) ] });
+        doc.addSection({ children: [ para ] });
+      }
+    });
+
+    const packer = new Packer();
+    const blob = await packer.toBlob(doc);
+    const name = `${pdfFileName || 'converted'}.docx`;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 5000);
+    statusEl.innerText = `.docx ready — downloaded as ${name}`;
+  } catch(err){
+    console.error(err);
+    alert('Failed to generate .docx: ' + (err.message || err));
+    statusEl.innerText = 'Error creating .docx';
+  }
+});
+
+downloadRawBtn.addEventListener('click', ()=>{
+  if(!extractedText.trim()){ alert('No text to download'); return; }
+  const blob = new Blob([extractedText], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${pdfFileName || 'extracted'}.txt`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+});
+
+copyBtn.addEventListener('click', ()=>{
+  if(!extractedText.trim()) return alert('No text to copy');
+  navigator.clipboard.writeText(extractedText).then(()=>alert('Copied to clipboard'));
+});
+
+clearBtn.addEventListener('click', ()=>{
+  pdfInput.value = '';
+  pagesRange.value = '';
+  previewText.innerText = '—';
+  statusEl.innerText = 'Cleared';
+  fileInfo.innerText = 'No file selected';
+  extractedText = '';
+  loadedPdf = null;
+  exportBtn.disabled = true;
+  downloadRawBtn.disabled = true;
+  copyBtn.disabled = true;
+});
+
+/* Accessibility: keyboard open file dialog */
+document.querySelectorAll('input[type=file]').forEach(inp=>{
+  const parent = inp.closest('.card');
+  if(parent) parent.addEventListener('keydown', e=>{ if(e.key==='Enter') inp.click(); });
+});
+</script>
+</body>
+</html>
