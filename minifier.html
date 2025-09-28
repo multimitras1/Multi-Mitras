@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML/CSS/JS Minifier | Minify Your Code Online</title>
+<meta name="description" content="Minify HTML, CSS, or JS code online instantly with our free HTML/CSS/JS Minifier tool. Save space and optimize your code easily.">
+<meta name="keywords" content="HTML Minifier, CSS Minifier, JS Minifier, Minify Code Online, Free Code Minifier Tool">
+<meta name="robots" content="index, follow">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0d6efd, #ffffff);
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+  }
+  h1, h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  .container {
+    background: #fff;
+    max-width: 650px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: left;
+  }
+  textarea {
+    width: 100%;
+    height: 200px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #0d6efd;
+    border-radius: 8px;
+    font-size: 16px;
+    resize: vertical;
+    font-family: monospace;
+  }
+  select, button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  button {
+    background: #0d6efd;
+    color: #fff;
+  }
+  button:hover {
+    background: #0b5ed7;
+  }
+  #result {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+  .ads {
+    margin: 15px 0;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>💻 HTML/CSS/JS Minifier</h1>
+<h2>Minify your code online instantly</h2>
+
+<!-- 🔹 Top Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {
+    'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+</div>
+
+<div class="container">
+  <textarea id="codeInput" placeholder="Paste your HTML, CSS, or JS code here..."></textarea>
+
+  <select id="codeType">
+    <option value="html">HTML</option>
+    <option value="css">CSS</option>
+    <option value="js">JavaScript</option>
+  </select>
+
+  <button onclick="minifyCode()">Minify Code</button>
+
+  <div id="result"></div>
+</div>
+
+<!-- 🔹 Middle Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {
+    'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+</div>
+
+<!-- 🔹 Bottom Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {
+    'key' : '496188380e746eef901d9058c8f77c85',
+    'format' : 'iframe',
+    'height' : 60,
+    'width' : 468,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+</div>
+
+<script>
+function minifyCode() {
+  const code = document.getElementById("codeInput").value.trim();
+  const resultDiv = document.getElementById("result");
+
+  if(!code){
+    resultDiv.innerHTML = "⚠️ Please enter some code!";
+    return;
+  }
+
+  const type = document.getElementById("codeType").value;
+  let minified = code;
+
+  if(type === "html") {
+    minified = code.replace(/\n/g, '').replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+  } else if(type === "css") {
+    minified = code.replace(/\s+/g, ' ').replace(/\s*([{};:,+>])\s*/g, '$1').trim();
+  } else if(type === "js") {
+    minified = code.replace(/\s+/g, ' ').replace(/\s*([{};=()+,-])\s*/g, '$1').trim();
+  }
+
+  resultDiv.innerHTML = `<pre>${minified}</pre>`;
+}
+</script>
+
+</body>
+</html>
