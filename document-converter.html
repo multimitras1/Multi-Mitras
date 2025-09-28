@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+      background: #f3f3f3;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+      display: inline-block;
+    }
+    input, select, button {
+      margin: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #2c3e50;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #34495e;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📄 Document Converter</h1>
+  <div class="container">
+    <input type="file" id="fileInput" accept=".doc,.docx,.pdf,.txt,.xlsx,.pptx,.png,.jpg,.jpeg"><br>
+    
+    <label for="format">Convert to:</label>
+    <select id="format">
+      <option value="pdf">PDF</option>
+      <option value="txt">TXT</option>
+      <option value="docx">DOCX</option>
+    </select><br>
+
+    <button onclick="convertDocument()">Convert</button>
+    <p id="status"></p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    async function convertDocument() {
+      let fileInput = document.getElementById("fileInput");
+      let format = document.getElementById("format").value;
+      let status = document.getElementById("status");
+
+      if (!fileInput.files.length) {
+        status.innerText = "⚠️ Please select a file!";
+        return;
+      }
+
+      let file = fileInput.files[0];
+      let fileName = file.name.split(".")[0];
+      let reader = new FileReader();
+
+      reader.onload = async function(e) {
+        let arrayBuffer = e.target.result;
+
+        if (file.name.endsWith(".docx") && format === "txt") {
+          // DOCX ➝ TXT
+          mammoth.extractRawText({arrayBuffer: arrayBuffer})
+            .then(function(result) {
+              downloadFile(result.value, fileName + ".txt");
+            });
+        } 
+        else if (file.name.endsWith(".txt") && format === "pdf") {
+          // TXT ➝ PDF
+          const pdfDoc = await PDFLib.PDFDocument.create();
+          const page = pdfDoc.addPage([600, 800]);
+          page.drawText(new TextDecoder().decode(arrayBuffer), {x: 50, y: 750, size: 12});
+          const pdfBytes = await pdfDoc.save();
+          downloadFile(pdfBytes, fileName + ".pdf", true);
+        }
+        else if (file.name.endsWith(".xlsx") && format === "txt") {
+          // Excel ➝ TXT
+          let workbook = XLSX.read(arrayBuffer, {type:"array"});
+          let sheetName = workbook.SheetNames[0];
+          let sheet = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+          downloadFile(sheet, fileName + ".txt");
+        }
+        else {
+          status.innerText = "❌ Conversion not supported yet!";
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+
+    function downloadFile(data, filename, isBinary=false) {
+      let blob;
+      if (isBinary) {
+        blob = new Blob([data], { type: "application/pdf" });
+      } else {
+        blob = new Blob([data], { type: "text/plain" });
+      }
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+  </script>
+
+</body>
+</html>
