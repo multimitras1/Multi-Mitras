@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GST Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0d6efd, #ffffff);
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+  }
+  h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  .container {
+    background: #fff;
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #0d6efd;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+  button {
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 95%;
+    margin-top: 10px;
+  }
+  button:hover {
+    background: #0b5ed7;
+  }
+  #result {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  .ads {
+    margin: 15px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>🧾 GST Calculator</h1>
+
+<!-- 🔹 Top Ad -->
+<div class="ads">
+  <script type="text/javascript">
+    atOptions = {
+      'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+      'format' : 'iframe',
+      'height' : 90,
+      'width' : 728,
+      'params' : {}
+    };
+  </script>
+  <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+</div>
+
+<div class="container">
+  <label for="price">Price (₹)</label>
+  <input type="number" id="price" placeholder="Enter price">
+
+  <label for="gstRate">GST Rate (%)</label>
+  <input type="number" id="gstRate" placeholder="Enter GST rate">
+
+  <button onclick="calculateGST()">Calculate GST</button>
+
+  <div id="result"></div>
+</div>
+
+<!-- 🔹 Middle Ad -->
+<div class="ads">
+  <script type="text/javascript">
+    atOptions = {
+      'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+      'format' : 'iframe',
+      'height' : 250,
+      'width' : 300,
+      'params' : {}
+    };
+  </script>
+  <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+</div>
+
+<!-- 🔹 Bottom Ad -->
+<div class="ads">
+  <script type="text/javascript">
+    atOptions = {
+      'key' : '496188380e746eef901d9058c8f77c85',
+      'format' : 'iframe',
+      'height' : 60,
+      'width' : 468,
+      'params' : {}
+    };
+  </script>
+  <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+</div>
+
+<script>
+function calculateGST() {
+  const price = parseFloat(document.getElementById('price').value);
+  const gstRate = parseFloat(document.getElementById('gstRate').value);
+  const result = document.getElementById('result');
+
+  if(!price || !gstRate){
+    result.innerHTML = "⚠️ Please fill both fields!";
+    return;
+  }
+
+  const gstAmount = (price * gstRate / 100).toFixed(2);
+  const totalPrice = (price + parseFloat(gstAmount)).toFixed(2);
+  const priceWithoutGST = (price / (1 + gstRate/100)).toFixed(2);
+
+  result.innerHTML = `
+    ✅ GST Amount: ₹${gstAmount} <br>
+    💰 Total Price (Inclusive GST): ₹${totalPrice} <br>
+    ℹ️ Price Without GST: ₹${priceWithoutGST}
+  `;
+}
+</script>
+
+</body>
+</html>
