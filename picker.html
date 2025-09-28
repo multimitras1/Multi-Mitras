@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Picker from Image | Pick Colors Online</title>
+<meta name="description" content="Pick colors from any image online instantly with our free Color Picker from Image tool. Get HEX and RGB values easily. Mobile-friendly and responsive.">
+<meta name="keywords" content="Color Picker from Image, Pick Color Online, Image Color Picker, HEX RGB Picker, Free Color Tool">
+<meta name="robots" content="index, follow">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0d6efd, #ffffff);
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+  }
+  h1, h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  .container {
+    background: #fff;
+    max-width: 650px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: left;
+  }
+  input[type=file], button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 2px solid #0d6efd;
+    font-size: 16px;
+  }
+  button {
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #0b5ed7;
+  }
+  canvas {
+    width: 100%;
+    max-height: 400px;
+    display: block;
+    margin: 10px 0;
+    border: 1px solid #0d6efd;
+    border-radius: 8px;
+  }
+  #result {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    word-wrap: break-word;
+  }
+  .ads {
+    margin: 15px 0;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>🖼 Color Picker from Image</h1>
+<h2>Upload an image and pick colors from it</h2>
+
+<!-- 🔹 Top Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {
+    'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+</div>
+
+<div class="container">
+  <input type="file" id="imageInput" accept="image/*">
+  <canvas id="canvas"></canvas>
+  <button onclick="enableColorPick()">Pick Color</button>
+  <div id="result">HEX: #000000 | RGB: rgb(0,0,0)</div>
+</div>
+
+<!-- 🔹 Middle Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {
+    'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+</div>
+
+<!-- 🔹 Bottom Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {
+    'key' : '496188380e746eef901d9058c8f77c85',
+    'format' : 'iframe',
+    'height' : 60,
+    'width' : 468,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+</div>
+
+<script>
+let canvas = document.getElementById('canvas');
+let ctx = canvas.getContext('2d');
+let img = new Image();
+
+document.getElementById('imageInput').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(event){
+      img.onload = function(){
+        canvas.width = img.width > 600 ? 600 : img.width;
+        canvas.height = img.height * (canvas.width/img.width);
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      }
+      img.src = event.target.result;
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+function enableColorPick(){
+  canvas.addEventListener('click', pickColor);
+  alert('Click on the image to pick a color.');
+}
+
+function pickColor(e){
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const pixel = ctx.getImageData(x,y,1,1).data;
+  const r = pixel[0];
+  const g = pixel[1];
+  const b = pixel[2];
+  const hex = "#" + ((1 << 24) + (r <<16) + (g <<8) + b).toString(16).slice(1).toUpperCase();
+  document.getElementById('result').innerText = `HEX: ${hex} | RGB: rgb(${r},${g},${b})`;
+  canvas.removeEventListener('click', pickColor);
+}
+</script>
+
+</body>
+</html>
