@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paragraph Typing Practice | Improve Typing Speed</title>
+<meta name="description" content="Practice typing paragraphs online with our free Paragraph Typing Practice tool. Get real-time WPM and accuracy. Mobile-friendly and responsive.">
+<meta name="keywords" content="Paragraph Typing Practice, Typing Practice Online, Improve Typing Speed, Typing Accuracy, Online Typing Tool, Free Typing Practice">
+<meta name="robots" content="index, follow">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0d6efd, #ffffff);
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+h1, h2 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+.container {
+  background: #fff;
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  text-align: left;
+}
+textarea, button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 2px solid #0d6efd;
+  font-size: 16px;
+}
+button {
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+button:hover {
+  background: #0b5ed7;
+}
+#paragraph {
+  background: #f0f8ff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  min-height: 100px;
+}
+.stats {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+.ads {
+  margin: 15px 0;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<h1>✍️ Paragraph Typing Practice</h1>
+<h2>Practice typing different paragraphs online</h2>
+
+<!-- 🔹 Top Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {'key':'a4236a38fef8b51c08a860f7e29b1a32','format':'iframe','height':90,'width':728,'params':{}};
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+</div>
+
+<div class="container">
+  <button onclick="startPractice()">Start Practice</button>
+
+  <div id="paragraph"></div>
+  <textarea id="inputArea" placeholder="Start typing here..." disabled></textarea>
+  <div class="stats" id="stats">WPM: 0 | Accuracy: 0%</div>
+</div>
+
+<!-- 🔹 Middle Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+</div>
+
+<!-- 🔹 Bottom Ad -->
+<div class="ads">
+<script type="text/javascript">
+  atOptions = {'key':'496188380e746eef901d9058c8f77c85','format':'iframe','height':60,'width':468,'params':{}};
+</script>
+<script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+</div>
+
+<script>
+const paragraphs = [
+  "The quick brown fox jumps over the lazy dog to test your typing skills.",
+  "Learning to type accurately and quickly is an essential skill for everyone.",
+  "Practice regularly to improve your typing speed and maintain accuracy.",
+  "Typing practice helps enhance focus, concentration, and keyboard efficiency.",
+  "Consistent practice with different paragraphs builds confidence in typing."
+];
+
+let interval, startTime, wordsTyped = 0;
+
+function getRandomParagraph() {
+  return paragraphs[Math.floor(Math.random() * paragraphs.length)];
+}
+
+function startPractice() {
+  document.getElementById('inputArea').value = '';
+  document.getElementById('stats').innerText = "WPM: 0 | Accuracy: 0%";
+  document.getElementById('paragraph').innerText = getRandomParagraph();
+  document.getElementById('inputArea').disabled = false;
+  document.getElementById('inputArea').focus();
+  wordsTyped = 0;
+  startTime = Date.now();
+
+  if(interval) clearInterval(interval);
+  interval = setInterval(updateStats, 1000);
+}
+
+function updateStats() {
+  const typed = document.getElementById('inputArea').value;
+  const para = document.getElementById('paragraph').innerText;
+  const typedWords = typed.trim().split(/\s+/).length;
+  wordsTyped = typedWords;
+
+  // Accuracy calculation
+  let correctChars = 0;
+  for(let i=0;i<typed.length;i++){
+    if(typed[i] === para[i]) correctChars++;
+  }
+  const accuracy = typed.length === 0 ? 0 : Math.round((correctChars/typed.length)*100);
+  const elapsedMinutes = (Date.now() - startTime)/60000;
+  const wpm = Math.round(wordsTyped/elapsedMinutes);
+
+  document.getElementById('stats').innerText = `WPM: ${wpm} | Accuracy: ${accuracy}%`;
+
+  // If user finishes paragraph, load new one
+  if(typed.length >= para.length) {
+    document.getElementById('paragraph').innerText = getRandomParagraph();
+    document.getElementById('inputArea').value = '';
+  }
+}
+</script>
+
+</body>
+</html>
