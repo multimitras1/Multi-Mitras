@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Age Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0d6efd, #ffffff);
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .calculator {
+      max-width: 400px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    input {
+      padding: 10px;
+      margin: 10px;
+      font-size: 1em;
+      border: 2px solid #0d6efd;
+      border-radius: 8px;
+      width: 90%;
+    }
+    button {
+      background: #0d6efd;
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      margin-top: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0b5ed7;
+    }
+    #result {
+      margin-top: 15px;
+      font-size: 1.2em;
+      color: #2c3e50;
+      font-weight: bold;
+    }
+    .ads {
+      margin: 15px 0;
+    }
+    @media (max-width: 500px) {
+      .calculator {
+        width: 100%;
+      }
+      input {
+        font-size: 0.9em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎂 Age Calculator</h1>
+
+  <!-- 🔹 Top Banner Ad -->
+  <div class="ads">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+  </div>
+
+  <div class="calculator">
+    <h3>अपनी जन्मतिथि डालें:</h3>
+    <input type="date" id="dob">
+    <br>
+    <button onclick="calculateAge()">Calculate Age</button>
+    <div id="result"></div>
+  </div>
+
+  <!-- 🔹 Middle Ad -->
+  <div class="ads">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+  </div>
+
+  <!-- 🔹 Bottom Banner Ad -->
+  <div class="ads">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '496188380e746eef901d9058c8f77c85',
+        'format' : 'iframe',
+        'height' : 60,
+        'width' : 468,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+  </div>
+
+  <script>
+    function calculateAge() {
+      const dob = document.getElementById("dob").value;
+      const result = document.getElementById("result");
+
+      if (!dob) {
+        result.innerText = "⚠️ Please select your Date of Birth!";
+        return;
+      }
+
+      const birthDate = new Date(dob);
+      const today = new Date();
+
+      let years = today.getFullYear() - birthDate.getFullYear();
+      let months = today.getMonth() - birthDate.getMonth();
+      let days = today.getDate() - birthDate.getDate();
+
+      if (days < 0) {
+        months--;
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+      }
+
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      result.innerText = `✅ Your Age: ${years} Years, ${months} Months, ${days} Days`;
+    }
+  </script>
+
+</body>
+</html>
