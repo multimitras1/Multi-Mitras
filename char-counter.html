@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word & Character Counter</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0d6efd, #ffffff);
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+  }
+  h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  .container {
+    background: #fff;
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: left;
+  }
+  textarea {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #0d6efd;
+    border-radius: 8px;
+    font-size: 16px;
+    resize: vertical;
+  }
+  button {
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+  }
+  button:hover {
+    background: #0b5ed7;
+  }
+  #result {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  .ads {
+    margin: 15px 0;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>📝 Word & Character Counter</h1>
+
+<!-- 🔹 Top Ad -->
+<div class="ads">
+  <script type="text/javascript">
+    atOptions = {
+      'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+      'format' : 'iframe',
+      'height' : 90,
+      'width' : 728,
+      'params' : {}
+    };
+  </script>
+  <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+</div>
+
+<div class="container">
+  <textarea id="textInput" placeholder="Enter or paste your text here..."></textarea>
+  <button onclick="countText()">Count Words & Characters</button>
+  <div id="result"></div>
+</div>
+
+<!-- 🔹 Middle Ad -->
+<div class="ads">
+  <script type="text/javascript">
+    atOptions = {
+      'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+      'format' : 'iframe',
+      'height' : 250,
+      'width' : 300,
+      'params' : {}
+    };
+  </script>
+  <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+</div>
+
+<!-- 🔹 Bottom Ad -->
+<div class="ads">
+  <script type="text/javascript">
+    atOptions = {
+      'key' : '496188380e746eef901d9058c8f77c85',
+      'format' : 'iframe',
+      'height' : 60,
+      'width' : 468,
+      'params' : {}
+    };
+  </script>
+  <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+</div>
+
+<script>
+function countText() {
+  const text = document.getElementById("textInput").value.trim();
+  const resultDiv = document.getElementById("result");
+
+  if(!text) {
+    resultDiv.innerHTML = "⚠️ Please enter some text!";
+    return;
+  }
+
+  const words = text.split(/\s+/).filter(word => word.length > 0).length;
+  const charsWithSpaces = text.length;
+  const charsWithoutSpaces = text.replace(/\s+/g, '').length;
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+  const paragraphs = text.split(/\n+/).filter(p => p.trim().length > 0).length;
+
+  resultDiv.innerHTML = `
+    ✅ Words: ${words} <br>
+    ✏️ Characters (with spaces): ${charsWithSpaces} <br>
+    ✏️ Characters (without spaces): ${charsWithoutSpaces} <br>
+    📝 Sentences: ${sentences} <br>
+    📄 Paragraphs: ${paragraphs}
+  `;
+}
+</script>
+
+</body>
+</html>
