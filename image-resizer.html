@@ -1,319 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Resizer — KathaByte Tools</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Resizer Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0d47a1, #1976d2);
+      color: #fff;
+    }
+    header {
+      text-align: center;
+      padding: 10px;
+      background: #1565c0;
+    }
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+    }
+    .tool-area {
+      flex: 1;
+      min-width: 280px;
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .tool-area input, .tool-area button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    .tool-area button {
+      background: #1976d2;
+      color: #fff;
+      cursor: pointer;
+    }
+    .tool-area button:hover {
+      background: #0d47a1;
+    }
+    .preview {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .preview img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .ads {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .sidebar {
+      width: 160px;
+      min-width: 160px;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      background: #0d47a1;
+      padding: 15px;
+      margin-top: 20px;
+    }
 
-<!-- JSZip for ZIP download -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-<style>
-:root{
-  --bg1:#eaf6ff;
-  --blue-deep:#0d47a1;
-  --blue-mid:#0077d6;
-  --accent:#00c3ff;
-  --card-radius:14px;
-  --text-dark:#042a4a;
-  --glass: rgba(255,255,255,0.88);
-}
-*{box-sizing:border-box;}
-body{
-  margin:0;
-  min-height:100vh;
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-  background: radial-gradient(1200px 600px at 10% 10%, rgba(0,195,255,0.06), transparent),
-              linear-gradient(135deg,#e6f4ff 0%, #ffffff 60%);
-  color:var(--text-dark);
-  display:flex;
-  align-items:start;
-  justify-content:center;
-  padding:20px;
-}
-.wrap{
-  width:100%;
-  max-width:1100px;
-  display:grid;
-  grid-template-columns:1fr 320px;
-  gap:18px;
-  align-items:start;
-}
-.card{
-  background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.90));
-  border-radius:var(--card-radius);
-  padding:16px;
-  box-shadow:0 10px 30px rgba(3,54,120,0.06);
-  border:1px solid rgba(13,71,161,0.06);
-}
-header.card{
-  grid-column:1/-1;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-h1{margin:0;font-size:18px;color:var(--blue-deep);display:flex;gap:10px;align-items:center;}
-p.lead{margin:6px 0 0;color:#0b4b72;font-size:13px;}
-
-.uploader{
-  border-radius:10px;
-  padding:18px;
-  background: linear-gradient(180deg, rgba(13,71,161,0.03), rgba(13,71,161,0.015));
-  border:1px dashed rgba(13,71,161,0.06);
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  align-items:center;
-  justify-content:center;
-  min-height:180px;
-}
-.drop{
-  width:100%;
-  padding:16px;
-  border-radius:10px;
-  text-align:center;
-  cursor:pointer;
-  background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.98));
-  box-shadow:0 6px 18px rgba(0,195,255,0.04);
-  border:1px solid rgba(13,71,161,0.04);
-}
-.drop input{display:none;}
-.small{font-size:13px;color:#0b4b72;}
-
-.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
-button.primary{background:linear-gradient(90deg,var(--accent),var(--blue-mid));color:#fff;border:none;cursor:pointer;font-weight:700;}
-button.ghost{background:transparent;border:1px dashed rgba(13,71,161,0.06);color:var(--blue-mid);cursor:pointer;}
-.preview-list{margin-top:12px;display:grid;gap:10px;max-height:520px;overflow:auto;padding-right:6px;}
-.preview-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;background:#fff;border:1px solid rgba(13,71,161,0.04);}
-.preview-item img{width:96px;height:64px;object-fit:cover;border-radius:8px;}
-.meta{font-size:13px;color:#0b4b72;}
-.meta b{color:var(--blue-deep);}
-.controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
-.right-col{display:flex;flex-direction:column;gap:12px;}
-.ad-slot{margin:12px 0;text-align:center;}
-footer{grid-column:1/-1;margin-top:6px;font-size:12px;color:#0b4b72;text-align:center;}
-@media(max-width:1000px){.wrap{grid-template-columns:1fr}.right-col{order:-1}}
-@media(max-width:420px){.preview-item img{width:72px;height:52px}}
-</style>
+    /* Responsive */
+    @media (min-width: 900px) {
+      .sidebar {
+        display: block;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
 
-<header class="card">
-  <div>
-    <h1>🖼️ Image Resizer</h1>
-    <p class="lead">Resize images in-browser — keep aspect ratio or set width/height.</p>
-  </div>
-  <div style="min-width:220px;text-align:right">
-    <!-- Top Banner Ad (728x90) -->
-    <div class="ad-slot" aria-hidden>
+  <header>
+    <h1>Image Resizer Tool</h1>
+    <!-- Header Ad -->
+    <div class="ads">
       <script type="text/javascript">
-        atOptions = {'key':'a4236a38fef8b51c08a860f7e29b1a32','format':'iframe','height':90,'width':728,'params':{}};
+        atOptions = {
+          'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+          'format' : 'iframe',
+          'height' : 90,
+          'width' : 728,
+          'params' : {}
+        };
       </script>
       <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
     </div>
-  </div>
-</header>
+  </header>
 
-<section class="card">
-  <div class="uploader" id="uploader">
-    <div class="drop" id="dropzone">
-      <input type="file" id="fileInput" accept="image/*" multiple>
-      <div style="font-weight:700;color:var(--blue-deep)">Click or Drop images here</div>
-      <div class="small">Supported: JPEG, PNG, WebP</div>
+  <div class="container">
+    <div class="tool-area">
+      <h2>Upload and Resize Image</h2>
+      <input type="file" id="upload" accept="image/*">
+      <input type="number" id="width" placeholder="Enter Width (px)">
+      <input type="number" id="height" placeholder="Enter Height (px)">
+      <button onclick="resizeImage()">Resize & Download</button>
+      <div class="preview" id="preview"></div>
+
+      <!-- Mid Content Ad -->
+      <div class="ads">
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+      </div>
     </div>
 
-    <div class="controls-grid">
-      <div>
-        <label for="width">Width (px)</label>
-        <input id="width" type="number" min="0" value="0">
-      </div>
-      <div>
-        <label for="height">Height (px)</label>
-        <input id="height" type="number" min="0" value="0">
-      </div>
-      <div style="grid-column:1/-1">
-        <label><input type="checkbox" id="keepRatio" checked> Maintain aspect ratio</label>
-      </div>
-    </div>
-
-    <div class="row">
-      <button class="primary" id="resizeBtn">Resize Selected</button>
-      <button class="ghost" id="clearBtn">Clear</button>
-      <button class="ghost" id="downloadAllBtn">Download All (ZIP)</button>
+    <!-- Sidebar Ad (Desktop Only) -->
+    <div class="sidebar ads">
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '962ff242b01ed125eb9b14423f7dbd3f',
+          'format' : 'iframe',
+          'height' : 300,
+          'width' : 160,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js"></script>
     </div>
   </div>
 
-  <div class="preview-list" id="previewList">
-    <div class="small" style="opacity:.8">No images yet — upload to start resizing.</div>
-  </div>
+  <footer>
+    <p>© 2025 Multi-Tool Website</p>
+    <!-- Footer Ad -->
+    <div class="ads">
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '496188380e746eef901d9058c8f77c85',
+          'format' : 'iframe',
+          'height' : 60,
+          'width' : 468,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+    </div>
+  </footer>
 
-  <!-- Middle Ad (300x250) -->
-  <div class="ad-slot" aria-hidden>
-    <script type="text/javascript">
-      atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};
-    </script>
-    <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
-  </div>
-</section>
+  <script>
+    let uploadedImage = null;
 
-<aside class="card right-col">
-  <div>
-    <label class="small">Selected files</label>
-    <div id="summary" class="small">0 files · Total original: 0 KB</div>
-  </div>
-  <div>
-    <label class="small">Last operation</label>
-    <div id="lastOp" class="small">—</div>
-  </div>
-  <!-- Side ad (160x300) -->
-  <div class="ad-slot" aria-hidden>
-    <script type="text/javascript">
-      atOptions = {'key':'962ff242b01ed125eb9b14423f7dbd3f','format':'iframe','height':300,'width':160,'params':{}};
-    </script>
-    <script type="text/javascript" src="//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js"></script>
-  </div>
-  <!-- Bottom small banner (468x60) -->
-  <div class="ad-slot" aria-hidden>
-    <script type="text/javascript">
-      atOptions = {'key':'496188380e746eef901d9058c8f77c85','format':'iframe','height':60,'width':468,'params':{}};
-    </script>
-    <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
-  </div>
-</aside>
-
-<footer class="card">
-  Image Resizer • Client-side resizing — no upload to server required.
-</footer>
-</div>
-
-<script>
-const dropzone=document.getElementById('dropzone');
-const fileInput=document.getElementById('fileInput');
-const previewList=document.getElementById('previewList');
-const widthEl=document.getElementById('width');
-const heightEl=document.getElementById('height');
-const keepRatioEl=document.getElementById('keepRatio');
-const resizeBtn=document.getElementById('resizeBtn');
-const clearBtn=document.getElementById('clearBtn');
-const downloadAllBtn=document.getElementById('downloadAllBtn');
-const summary=document.getElementById('summary');
-const lastOp=document.getElementById('lastOp');
-let files=[];
-
-['dragenter','dragover'].forEach(e=>dropzone.addEventListener(e,ev=>{ev.preventDefault();dropzone.style.boxShadow='0 8px 22px rgba(0,195,255,0.12)';}));
-['dragleave','drop'].forEach(e=>dropzone.addEventListener(e,ev=>{ev.preventDefault();dropzone.style.boxShadow='';}));
-dropzone.addEventListener('drop',e=>{const dt=e.dataTransfer;if(dt&&dt.files)handleFiles(dt.files);});
-dropzone.addEventListener('click',()=>fileInput.click());
-fileInput.addEventListener('change',e=>handleFiles(e.target.files));
-
-function handleFiles(fileList){
-  const arr=Array.from(fileList).filter(f=>f.type.startsWith('image/'));
-  if(!arr.length){alert('Please select image files.');return;}
-  arr.forEach(f=>{const url=URL.createObjectURL(f);files.push({file:f,url,blob:null});});
-  renderPreviews();
-}
-
-function renderPreviews(){
-  previewList.innerHTML='';
-  if(!files.length){previewList.innerHTML='<div class="small" style="opacity:.8">No images yet — upload to start resizing.</div>';summary.innerText='0 files · Total original: 0 KB';return;}
-  let totalOrig=0;
-  files.forEach((item,idx)=>{
-    totalOrig+=item.file.size;
-    const div=document.createElement('div');
-    div.className='preview-item';
-    div.innerHTML=`
-      <img src="${item.url}" alt="${item.file.name}" />
-      <div style="flex:1;text-align:left">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:700">${item.file.name}</div>
-          <div style="font-size:13px;color:#0b4b72">${(item.file.size/1024).toFixed(1)} KB</div>
-        </div>
-        <div class="meta">
-          <div>Output: ${item.blob?(item.blob.size/1024).toFixed(1)+' KB':'Not resized'}</div>
-          <div style="margin-top:6px">
-            <button class="ghost" data-idx="${idx}" data-action="resize">Resize</button>
-            <button class="ghost" data-idx="${idx}" data-action="download" ${item.blob?'':'disabled'}>Download</button>
-            <button class="ghost" data-idx="${idx}" data-action="remove">Remove</button>
-          </div>
-        </div>
-      </div>`;
-    previewList.appendChild(div);
-  });
-  summary.innerText=`${files.length} files · Total original: ${(totalOrig/1024).toFixed(1)} KB`;
-  attachButtons();
-}
-
-function attachButtons(){
-  previewList.querySelectorAll('button[data-action]').forEach(btn=>{
-    btn.addEventListener('click',async e=>{
-      const idx=+e.currentTarget.getAttribute('data-idx');
-      const action=e.currentTarget.getAttribute('data-action');
-      if(action==='resize'){await resizeSingle(idx);}
-      else if(action==='download'){downloadBlob(files[idx].blob,files[idx].file.name);}
-      else if(action==='remove'){URL.revokeObjectURL(files[idx].url);files.splice(idx,1);renderPreviews();}
+    document.getElementById('upload').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          uploadedImage = new Image();
+          uploadedImage.src = event.target.result;
+          uploadedImage.onload = function () {
+            document.getElementById('preview').innerHTML = '<img src="' + uploadedImage.src + '">';
+          };
+        };
+        reader.readAsDataURL(file);
+      }
     });
-  });
-}
 
-resizeBtn.addEventListener('click',async()=>{
-  if(!files.length){alert('No images selected');return;}
-  lastOp.innerText='Resizing all...';
-  for(let i=0;i<files.length;i++){await resizeSingle(i);}
-  lastOp.innerText='All images resized ✅';
-});
+    function resizeImage() {
+      if (!uploadedImage) {
+        alert("Please upload an image first!");
+        return;
+      }
+      const width = document.getElementById('width').value;
+      const height = document.getElementById('height').value;
+      if (!width || !height) {
+        alert("Please enter both width and height!");
+        return;
+      }
 
-clearBtn.addEventListener('click',()=>{
-  files.forEach(f=>URL.revokeObjectURL(f.url));
-  files=[];
-  renderPreviews();
-  lastOp.innerText='Cleared';
-});
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(uploadedImage, 0, 0, width, height);
 
-downloadAllBtn.addEventListener('click',async()=>{
-  if(!files.length){alert('No files.');return;}
-  const zip=new JSZip();
-  let any=false;
-  for(let i=0;i<files.length;i++){
-    const f=files[i];
-    if(f.blob){any=true;zip.file(f.file.name,await f.blob.arrayBuffer());}
-  }
-  if(!any){alert('No resized files — resize first.');return;}
-  lastOp.innerText='Creating ZIP...';
-  const content=await zip.generateAsync({type:"blob"});
-  downloadBlob(content,'resized-images.zip');
-  lastOp.innerText='ZIP ready ✅';
-});
-
-async function resizeSingle(idx){
-  const item=files[idx];
-  lastOp.innerText=`Resizing ${item.file.name}...`;
-  const maxW=parseInt(widthEl.value)||0;
-  const maxH=parseInt(heightEl.value)||0;
-  const keepRatio=keepRatioEl.checked;
-  try{
-    const img=await loadImage(item.url);
-    let targetW=img.width,targetH=img.height;
-    if(maxW>0||maxH>0){
-      if(keepRatio){
-        const ratio=Math.min(maxW>0?maxW/targetW:1,maxH>0?maxH/targetH:1);
-        targetW=Math.round(targetW*ratio);targetH=Math.round(targetH*ratio);
-      } else {if(maxW>0)targetW=maxW;if(maxH>0)targetH=maxH;}
+      canvas.toBlob((blob) => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = "resized-image.jpg";
+        link.click();
+      }, "image/jpeg", 1);
     }
-    const canvas=document.createElement('canvas');
-    canvas.width=targetW;canvas.height=targetH;
-    const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,targetW,targetH);
-    const blob=await new Promise(res=>canvas.toBlob(res,'image/png',0.95));
-    item.blob=blob;renderPreviews();
-    lastOp.innerText=`Resized ${item.file.name} → ${(blob.size/1024).toFixed(1)} KB`;
-  }catch(err){console.error(err);alert('Resize failed: '+err.message);lastOp.innerText='Error during resize';}
-}
+  </script>
 
-function loadImage(url){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=e=>rej(new Error('Image load failed'));img.src=url;});}
-
-function downloadBlob(blob,filename){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},5000);}
-window.addEventListener('unload',()=>files.forEach(f=>URL.revokeObjectURL(f.url)));
-</script>
 </body>
 </html>
