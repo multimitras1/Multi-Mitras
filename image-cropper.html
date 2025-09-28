@@ -1,209 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Cropper — KathaByte Tools</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Cropper Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0d47a1, #1976d2);
+      color: #fff;
+    }
+    header {
+      text-align: center;
+      padding: 10px;
+      background: #1565c0;
+    }
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+    }
+    .tool-area {
+      flex: 1;
+      min-width: 280px;
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .tool-area input, .tool-area button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    .tool-area button {
+      background: #1976d2;
+      color: #fff;
+      cursor: pointer;
+    }
+    .tool-area button:hover {
+      background: #0d47a1;
+    }
+    .preview {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .preview img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    canvas {
+      max-width: 100%;
+      margin-top: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .ads {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .sidebar {
+      width: 160px;
+      min-width: 160px;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      background: #0d47a1;
+      padding: 15px;
+      margin-top: 20px;
+    }
 
-<!-- Cropper.js library -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
-<style>
-:root{
-  --bg1:#eaf6ff;
-  --blue-deep:#0d47a1;
-  --blue-mid:#0077d6;
-  --accent:#00c3ff;
-  --card-radius:14px;
-  --text-dark:#042a4a;
-  --glass: rgba(255,255,255,0.88);
-}
-*{box-sizing:border-box;}
-body{
-  margin:0;
-  min-height:100vh;
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-  background: radial-gradient(1200px 600px at 10% 10%, rgba(0,195,255,0.06), transparent),
-              linear-gradient(135deg,#e6f4ff 0%, #ffffff 60%);
-  color:var(--text-dark);
-  display:flex;
-  align-items:start;
-  justify-content:center;
-  padding:20px;
-}
-.wrap{
-  width:100%;
-  max-width:1100px;
-  display:grid;
-  grid-template-columns:1fr 320px;
-  gap:18px;
-  align-items:start;
-}
-.card{
-  background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.90));
-  border-radius:var(--card-radius);
-  padding:16px;
-  box-shadow:0 10px 30px rgba(3,54,120,0.06);
-  border:1px solid rgba(13,71,161,0.06);
-}
-header.card{
-  grid-column:1/-1;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-h1{margin:0;font-size:18px;color:var(--blue-deep);display:flex;gap:10px;align-items:center;}
-p.lead{margin:6px 0 0;color:#0b4b72;font-size:13px;}
-
-.uploader{
-  border-radius:10px;
-  padding:18px;
-  background: linear-gradient(180deg, rgba(13,71,161,0.03), rgba(13,71,161,0.015));
-  border:1px dashed rgba(13,71,161,0.06);
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  align-items:center;
-  justify-content:center;
-  min-height:180px;
-}
-.drop{
-  width:100%;
-  padding:16px;
-  border-radius:10px;
-  text-align:center;
-  cursor:pointer;
-  background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.98));
-  box-shadow:0 6px 18px rgba(0,195,255,0.04);
-  border:1px solid rgba(13,71,161,0.04);
-}
-.drop input{display:none;}
-.small{font-size:13px;color:#0b4b72;}
-
-.crop-container{width:100%;max-height:500px;background:#f4faff;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-top:12px;border-radius:12px;border:1px solid rgba(13,71,161,0.06);}
-.crop-container img{max-width:100%;display:block;}
-
-.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
-button.primary{background:linear-gradient(90deg,var(--accent),var(--blue-mid));color:#fff;border:none;cursor:pointer;font-weight:700;}
-button.ghost{background:transparent;border:1px dashed rgba(13,71,161,0.06);color:var(--blue-mid);cursor:pointer;}
-
-.right-col{display:flex;flex-direction:column;gap:12px;}
-.ad-slot{margin:12px 0;text-align:center;}
-footer{grid-column:1/-1;margin-top:6px;font-size:12px;color:#0b4b72;text-align:center;}
-@media(max-width:1000px){.wrap{grid-template-columns:1fr}.right-col{order:-1}}
-</style>
+    /* Responsive */
+    @media (min-width: 900px) {
+      .sidebar {
+        display: block;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
 
-<header class="card">
-  <div>
-    <h1>✂️ Image Cropper</h1>
-    <p class="lead">Crop images in-browser with drag & aspect ratio control.</p>
-  </div>
-  <div style="min-width:220px;text-align:right">
-    <!-- Top Banner Ad (728x90) -->
-    <div class="ad-slot">
+  <header>
+    <h1>Image Cropper Tool</h1>
+    <!-- Header Ad -->
+    <div class="ads">
       <script type="text/javascript">
-        atOptions = {'key':'a4236a38fef8b51c08a860f7e29b1a32','format':'iframe','height':90,'width':728,'params':{}};
+        atOptions = {
+          'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+          'format' : 'iframe',
+          'height' : 90,
+          'width' : 728,
+          'params' : {}
+        };
       </script>
       <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
     </div>
-  </div>
-</header>
+  </header>
 
-<section class="card">
-  <div class="uploader" id="uploader">
-    <div class="drop" id="dropzone">
-      <input type="file" id="fileInput" accept="image/*">
-      <div style="font-weight:700;color:var(--blue-deep)">Click or Drop an image here</div>
-      <div class="small">Supported: JPEG, PNG, WebP</div>
+  <div class="container">
+    <div class="tool-area">
+      <h2>Upload and Crop Image</h2>
+      <input type="file" id="upload" accept="image/*">
+      <label>Crop Width (px):</label>
+      <input type="number" id="cropWidth" placeholder="Enter width">
+      <label>Crop Height (px):</label>
+      <input type="number" id="cropHeight" placeholder="Enter height">
+      <button onclick="cropImage()">Crop & Download</button>
+      <div class="preview" id="preview"></div>
+      <canvas id="canvas"></canvas>
+
+      <!-- Mid Content Ad -->
+      <div class="ads">
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+      </div>
+    </div>
+
+    <!-- Sidebar Ad (Desktop Only) -->
+    <div class="sidebar ads">
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '962ff242b01ed125eb9b14423f7dbd3f',
+          'format' : 'iframe',
+          'height' : 300,
+          'width' : 160,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js"></script>
     </div>
   </div>
 
-  <div class="crop-container">
-    <img id="cropImage" src="" alt="Upload image to crop" style="display:none;">
-  </div>
+  <footer>
+    <p>© 2025 Multi-Tool Website</p>
+    <!-- Footer Ad -->
+    <div class="ads">
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '496188380e746eef901d9058c8f77c85',
+          'format' : 'iframe',
+          'height' : 60,
+          'width' : 468,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+    </div>
+  </footer>
 
-  <div class="row">
-    <button class="primary" id="cropBtn">Crop & Download</button>
-    <label class="small"><input type="checkbox" id="maintainRatio" checked> Maintain aspect ratio</label>
-  </div>
+  <script>
+    let uploadedImage = null;
 
-  <!-- Middle Ad (300x250) -->
-  <div class="ad-slot">
-    <script type="text/javascript">
-      atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};
-    </script>
-    <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
-  </div>
-</section>
+    document.getElementById('upload').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          uploadedImage = new Image();
+          uploadedImage.src = event.target.result;
+          uploadedImage.onload = function () {
+            document.getElementById('preview').innerHTML = '<img src="' + uploadedImage.src + '">';
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-<aside class="card right-col">
-  <!-- Side ad (160x300) -->
-  <div class="ad-slot">
-    <script type="text/javascript">
-      atOptions = {'key':'962ff242b01ed125eb9b14423f7dbd3f','format':'iframe','height':300,'width':160,'params':{}};
-    </script>
-    <script type="text/javascript" src="//lightingshovestature.com/962ff242b01ed125eb9b14423f7dbd3f/invoke.js"></script>
-  </div>
-  <!-- Bottom small banner (468x60) -->
-  <div class="ad-slot">
-    <script type="text/javascript">
-      atOptions = {'key':'496188380e746eef901d9058c8f77c85','format':'iframe','height':60,'width':468,'params':{}};
-    </script>
-    <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
-  </div>
-</aside>
+    function cropImage() {
+      if (!uploadedImage) {
+        alert("Please upload an image first!");
+        return;
+      }
+      const cropWidth = parseInt(document.getElementById('cropWidth').value);
+      const cropHeight = parseInt(document.getElementById('cropHeight').value);
+      if (!cropWidth || !cropHeight) {
+        alert("Please enter crop width and height!");
+        return;
+      }
 
-<footer class="card">
-  Image Cropper • Client-side cropping — no upload to server required.
-</footer>
-</div>
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
 
-<script>
-const fileInput=document.getElementById('fileInput');
-const cropImage=document.getElementById('cropImage');
-const cropBtn=document.getElementById('cropBtn');
-const maintainRatio=document.getElementById('maintainRatio');
-let cropper=null;
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
 
-fileInput.addEventListener('change',e=>{
-  const file=e.target.files[0];
-  if(!file) return;
-  const url=URL.createObjectURL(file);
-  cropImage.src=url;
-  cropImage.style.display='block';
-  if(cropper) cropper.destroy();
-  cropper=new Cropper(cropImage,{
-    aspectRatio: maintainRatio.checked ? 1 : NaN,
-    viewMode:1,
-    autoCropArea:0.8,
-    movable:true,
-    zoomable:true,
-    responsive:true,
-    background:true,
-  });
-});
+      ctx.drawImage(uploadedImage, 0, 0, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
 
-maintainRatio.addEventListener('change',()=>{
-  if(cropper) cropper.setAspectRatio(maintainRatio.checked ? 1 : NaN);
-});
+      canvas.toBlob((blob) => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = "cropped-image.jpg";
+        link.click();
+      }, "image/jpeg", 1);
+    }
+  </script>
 
-cropBtn.addEventListener('click',()=>{
-  if(!cropper){alert('Upload an image first');return;}
-  const canvas=cropper.getCroppedCanvas();
-  canvas.toBlob(blob=>{
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='cropped-image.png';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},5000);
-  },'image/png');
-});
-</script>
 </body>
 </html>
