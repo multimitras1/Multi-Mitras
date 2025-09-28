@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scientific Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0d6efd, #ffffff);
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .calculator {
+      max-width: 400px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    #display {
+      width: 100%;
+      height: 50px;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      text-align: right;
+      padding: 8px;
+      border: 2px solid #0d6efd;
+      border-radius: 8px;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      padding: 15px;
+      font-size: 1em;
+      border: none;
+      border-radius: 8px;
+      background: #0d6efd;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #0b5ed7;
+    }
+    .ads {
+      margin: 15px 0;
+    }
+    @media (max-width: 500px) {
+      .calculator {
+        width: 100%;
+      }
+      button {
+        padding: 12px;
+        font-size: 0.9em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧮 Scientific Calculator</h1>
+
+  <!-- 🔹 Top Banner Ad -->
+  <div class="ads">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+  </div>
+
+  <div class="calculator">
+    <input type="text" id="display" disabled>
+
+    <div class="buttons">
+      <button onclick="clearDisplay()">C</button>
+      <button onclick="appendValue('(')">(</button>
+      <button onclick="appendValue(')')">)</button>
+      <button onclick="backspace()">⌫</button>
+
+      <button onclick="appendValue('7')">7</button>
+      <button onclick="appendValue('8')">8</button>
+      <button onclick="appendValue('9')">9</button>
+      <button onclick="appendValue('/')">÷</button>
+
+      <button onclick="appendValue('4')">4</button>
+      <button onclick="appendValue('5')">5</button>
+      <button onclick="appendValue('6')">6</button>
+      <button onclick="appendValue('*')">×</button>
+
+      <button onclick="appendValue('1')">1</button>
+      <button onclick="appendValue('2')">2</button>
+      <button onclick="appendValue('3')">3</button>
+      <button onclick="appendValue('-')">−</button>
+
+      <button onclick="appendValue('0')">0</button>
+      <button onclick="appendValue('.')">.</button>
+      <button onclick="calculateResult()">=</button>
+      <button onclick="appendValue('+')">+</button>
+
+      <button onclick="appendValue('Math.sin(')">sin</button>
+      <button onclick="appendValue('Math.cos(')">cos</button>
+      <button onclick="appendValue('Math.tan(')">tan</button>
+      <button onclick="appendValue('Math.log(')">log</button>
+
+      <button onclick="appendValue('Math.sqrt(')">√</button>
+      <button onclick="appendValue('**')">xʸ</button>
+      <button onclick="appendValue('Math.PI')">π</button>
+      <button onclick="appendValue('Math.E')">e</button>
+    </div>
+  </div>
+
+  <!-- 🔹 Middle Ad -->
+  <div class="ads">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+  </div>
+
+  <!-- 🔹 Bottom Banner Ad -->
+  <div class="ads">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '496188380e746eef901d9058c8f77c85',
+        'format' : 'iframe',
+        'height' : 60,
+        'width' : 468,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+  </div>
+
+  <script>
+    const display = document.getElementById("display");
+
+    function appendValue(value) {
+      display.value += value;
+    }
+
+    function clearDisplay() {
+      display.value = "";
+    }
+
+    function backspace() {
+      display.value = display.value.slice(0, -1);
+    }
+
+    function calculateResult() {
+      try {
+        display.value = eval(display.value);
+      } catch {
+        display.value = "Error";
+      }
+    }
+  </script>
+
+</body>
+</html>
