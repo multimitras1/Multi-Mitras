@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free Online Document Scanner - Scan images or documents and extract text using OCR.">
+  <meta name="keywords" content="Document Scanner, OCR, Scan Document Online, Extract Text, Online Scanner">
+  <title>Free Online Document Scanner Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f8ff;
+      color: #333;
+      text-align: center;
+    }
+    header {
+      background: #009688;
+      color: white;
+      padding: 15px;
+    }
+    main {
+      max-width: 700px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button, textarea {
+      margin: 10px 0;
+      padding: 10px;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    button {
+      background: #009688;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #00796B;
+    }
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+    footer {
+      background: #222;
+      color: white;
+      padding: 10px;
+      margin-top: 20px;
+    }
+    .ad-box {
+      margin: 20px 0;
+      padding: 10px;
+      background: #e3e3e3;
+      border: 1px dashed #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Free Online Document Scanner (OCR)</h1>
+  </header>
+
+  <main>
+    <p>Scan your documents or images and extract text easily using our free online OCR tool.</p>
+
+    <div class="ad-box">[Your Ad Here]</div>
+
+    <input type="file" id="fileUpload" accept="image/*,.pdf">
+    <button onclick="scanDocument()">Scan Document</button>
+
+    <h3>Extracted Text:</h3>
+    <textarea id="outputText" placeholder="Extracted text will appear here..." readonly></textarea>
+    <button onclick="downloadText()">Download Text</button>
+
+    <div class="ad-box">[Your Ad Here]</div>
+  </main>
+
+  <footer>
+    <p>© 2025 All-in-One Tools | Free Online Document Scanner</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  <script>
+    let uploadedFile;
+
+    document.getElementById('fileUpload').addEventListener('change', function(e) {
+      uploadedFile = e.target.files[0];
+    });
+
+    async function scanDocument() {
+      if (!uploadedFile) {
+        alert("Please upload a document or image first!");
+        return;
+      }
+
+      const outputText = document.getElementById("outputText");
+      outputText.value = "Scanning... Please wait.";
+
+      try {
+        if(uploadedFile.type.includes("pdf")){
+          alert("PDF scanning requires server-side OCR or conversion. Use image files for demo.");
+          outputText.value = "";
+          return;
+        }
+
+        const result = await Tesseract.recognize(
+          URL.createObjectURL(uploadedFile),
+          'eng',
+          { logger: m => console.log(m) }
+        );
+
+        outputText.value = result.data.text || "No text detected!";
+      } catch (error) {
+        alert("Error: " + error.message);
+        outputText.value = "";
+      }
+    }
+
+    function downloadText() {
+      const text = document.getElementById("outputText").value;
+      if(!text) {
+        alert("No text to download!");
+        return;
+      }
+
+      const blob = new Blob([text], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "scanned-text.txt";
+      link.click();
+    }
+  </script>
+</body>
+</html>
