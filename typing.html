@@ -1,538 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Typing Speed Test — Practice & Measure Your WPM</title>
-<meta name="description" content="Live typing speed test similar to popular typing tests. Real-time WPM, accuracy, per-word feedback, mobile-friendly and responsive." />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typing Speed Test</title>
 <style>
-  :root{
-    --blue:#0d6efd;
-    --dark:#0b2540;
-    --muted:#556;
-    --bg:#f6fbff;
-    --card:#ffffff;
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  body {
+    font-family: Arial, sans-serif;
+    background: #fff8e7;
+    margin: 0;
+    padding: 0;
+    color: #333;
   }
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    min-height:100vh;
-    background: linear-gradient(180deg, var(--bg) 0%, #fff 100%);
-    color:var(--dark);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fff4d1;
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   }
-  .wrap{
-    width:100%;
-    max-width:980px;
+  h1 {
+    text-align: center;
+    color: #e69500;
+    margin-bottom: 10px;
   }
-  header{
-    text-align:left;
-    margin-bottom:12px;
+  .controls {
+    text-align: center;
+    margin-bottom: 20px;
   }
-  h1{margin:0;font-size:1.35rem;color:var(--blue)}
-  p.lead{margin:6px 0 14px;color:var(--muted);font-size:0.95rem}
-
-  .card{
-    background:var(--card);
-    border-radius:14px;
-    box-shadow:0 8px 30px rgba(13, 110, 253, 0.08);
-    padding:18px;
+  select, button {
+    padding: 10px 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
   }
-
-  .controls{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    align-items:center;
-    margin-bottom:12px;
+  select {
+    background: #fff;
+    border: 2px solid #f0c75e;
+    color: #333;
   }
-  .controls > *{flex:0 0 auto}
-  select, button{
-    padding:10px 14px;
-    border-radius:10px;
-    border:2px solid rgba(13,110,253,0.12);
-    background:transparent;
-    color:var(--dark);
-    font-weight:600;
+  button {
+    background: #ffb703;
+    color: white;
+    transition: 0.2s;
   }
-  .btn-primary{
-    background:var(--blue);
-    color:#fff;
-    border:none;
+  button:hover {
+    background: #fb8500;
   }
-  .btn-ghost{background:transparent}
-
-  .test-area{
-    display:flex;
-    gap:18px;
-    flex-wrap:wrap;
+  .paragraph-box {
+    background: #fff;
+    padding: 18px;
+    border-radius: 10px;
+    border: 2px solid #f0c75e;
+    min-height: 120px;
+    margin-bottom: 15px;
   }
-
-  .text-panel{
-    flex:1 1 620px;
-    min-width:260px;
+  #paragraph {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #222;
   }
-
-  .words-box{
-    background:linear-gradient(180deg,#f8fbff,#fff);
-    border-radius:10px;
-    padding:14px;
-    min-height:120px;
-    border:1px solid rgba(13,110,253,0.06);
-    overflow:hidden;
+  textarea {
+    width: 100%;
+    height: 120px;
+    border-radius: 10px;
+    border: 2px solid #f0c75e;
+    padding: 12px;
+    font-size: 1rem;
+    resize: none;
+    outline: none;
   }
-
-  .words{
-    font-size:1.05rem;
-    line-height:1.9;
-    color:var(--dark);
-    user-select:none;
-    word-wrap:break-word;
+  .stats {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
   }
-
-  .word{
-    display:inline-block;
-    margin-right:10px;
-    padding:2px 4px;
-    border-radius:6px;
-  }
-  .word.current{
-    background: rgba(13,110,253,0.08);
-    border:1px solid rgba(13,110,253,0.12);
-  }
-  .word.correct{ color: #0b8a2e; background: rgba(11,138,46,0.04) }
-  .word.incorrect{ color: #c92a2a; background: rgba(201,42,42,0.04) ; text-decoration:underline dotted red;}
-  .caret{
-    display:inline-block;
-    width:2px;
-    height:1.35rem;
-    background:var(--blue);
-    vertical-align:middle;
-    animation:blink 1s steps(2, start) infinite;
-  }
-  @keyframes blink{50%{opacity:0}}
-
-  /* hidden input */
-  #hiddenInput{
-    opacity:0;
-    position:absolute;
-    left:-9999px;
-  }
-
-  .stats-panel{
-    width:260px;
-    min-width:200px;
-    flex:0 0 260px;
-    border-radius:10px;
-    padding:14px;
-    background:linear-gradient(180deg,#fff,#f8fbff);
-    border:1px solid rgba(13,110,253,0.06);
-    height:fit-content;
-  }
-  .stat {display:flex;justify-content:space-between; margin:8px 0; font-weight:700;}
-  .stat small{font-weight:500;color:var(--muted);display:block;font-size:.8rem}
-  .meter{
-    height:10px;
-    background:#eef6ff;
-    border-radius:8px;
-    overflow:hidden;
-    margin-top:8px;
-  }
-  .meter > i{display:block;height:100%;background:var(--blue);width:0%}
-
-  .footer-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-  .results{
-    margin-top:14px;
-    padding:12px;
-    border-radius:8px;
-    background:#fbfdff;
-    color:var(--muted);
-    font-size:0.95rem;
-  }
-
-  /* mobile */
-  @media (max-width:840px){
-    .test-area{flex-direction:column-reverse}
-    .stats-panel{width:100%}
+  .stat {
+    background: #fff4d1;
+    padding: 12px;
+    border-radius: 10px;
+    flex: 1;
+    margin: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #444;
   }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Typing Speed Test</h1>
-      <p class="lead">Test your typing speed & accuracy. Inspired by popular online typing tests — live WPM, accuracy, per-word feedback.</p>
-    </header>
-
-    <div class="card" role="application" aria-label="Typing test">
-      <div class="controls" aria-hidden="false">
-        <label for="duration">Duration:</label>
-        <select id="duration" title="Select test duration">
-          <option value="15">15s</option>
-          <option value="30" selected>30s</option>
-          <option value="60">60s</option>
-          <option value="120">120s</option>
-        </select>
-
-        <label for="mode">Mode:</label>
-        <select id="mode" title="Mode">
-          <option value="words" selected>Words</option>
-          <option value="sentences">Sentences</option>
-          <option value="paragraphs">Paragraphs</option>
-        </select>
-
-        <button id="startBtn" class="btn-primary">Start</button>
-        <button id="restartBtn" class="btn-ghost">Restart</button>
-
-        <div style="margin-left:auto; font-size:.95rem; color:var(--muted)">Pro tip: Focus on accuracy first.</div>
-      </div>
-
-      <div class="test-area">
-        <div class="text-panel">
-          <div class="words-box" id="wordsBox" tabindex="0" role="textbox" aria-multiline="true">
-            <div class="words" id="words"></div>
-          </div>
-
-          <!-- hidden input to capture typing on mobile/desktop -->
-          <input id="hiddenInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
-          <div style="display:flex; gap:8px; align-items:center; margin-top:10px;">
-            <div class="small">Type in the box — the test captures input automatically.</div>
-            <button id="focusBtn" style="margin-left:auto;padding:8px 10px;border-radius:8px;border:1px solid rgba(13,110,253,0.12)">Focus</button>
-          </div>
-
-          <div class="results" id="message" aria-live="polite">
-            Ready — click <strong>Start</strong> to begin the test.
-          </div>
-        </div>
-
-        <aside class="stats-panel" aria-hidden="false">
-          <div class="stat">
-            <span>Time</span><span id="timeLeft">00:30</span>
-            <small id="timeLabel">remaining</small>
-          </div>
-          <div class="stat">
-            <span>WPM</span><span id="wpm">0</span>
-            <small>words/min</small>
-          </div>
-          <div class="stat">
-            <span>Accuracy</span><span id="accuracy">100%</span>
-            <small>correct chars</small>
-          </div>
-          <div class="stat">
-            <span>Correct</span><span id="correctCount">0</span>
-            <small>words</small>
-          </div>
-          <div class="stat">
-            <span>Incorrect</span><span id="incorrectCount">0</span>
-            <small>words</small>
-          </div>
-
-          <div style="margin-top:8px">
-            <div style="font-weight:700">Progress</div>
-            <div class="meter"><i id="progressBar"></i></div>
-          </div>
-
-          <div class="footer-actions">
-            <button id="copyResult" class="btn-ghost">Copy Result</button>
-            <button id="saveRecord" class="btn-ghost">Save</button>
-          </div>
-
-          <div style="margin-top:12px; font-size:.9rem; color:var(--muted)">
-            Sessions saved locally in your browser.
-          </div>
-        </aside>
-      </div>
-    </div>
+<div class="container">
+  <h1>Typing Speed Test</h1>
+  <div class="controls">
+    <label for="timeSelect">Select Duration: </label>
+    <select id="timeSelect">
+      <option value="60">1 Minute</option>
+      <option value="180">3 Minutes</option>
+      <option value="300">5 Minutes</option>
+    </select>
+    <button onclick="startTest()">Start Test</button>
   </div>
 
+  <div class="paragraph-box">
+    <p id="paragraph">Click "Start Test" to begin.</p>
+  </div>
+  <textarea id="inputBox" placeholder="Start typing here..." disabled></textarea>
+
+  <div class="stats">
+    <div class="stat">Time: <span id="time">0</span>s</div>
+    <div class="stat">WPM: <span id="wpm">0</span></div>
+    <div class="stat">Accuracy: <span id="accuracy">0%</span></div>
+  </div>
+</div>
+
 <script>
-/* -------------------------
-  Typing Test — core logic
-   - words/sentences/paragraphs mode
-   - per-word correctness
-   - WPM = correctChars/5 / minutes elapsed
-   - accuracy = correctChars / totalTypedChars
-   - local history save
----------------------------*/
-const WORDS = (`the quick brown fox jumps over the lazy dog
-typing speed test improves with practice
-practice makes perfect type daily
-javascript html css build small tools
-focus on accuracy before speed`).split(/\n/).map(s => s.trim());
+const paragraphs = [
+  "Typing fast is a useful skill in the digital age where communication is instant.",
+  "Practicing every day can significantly increase both your speed and accuracy.",
+  "Accuracy matters more than speed because errors reduce real typing efficiency.",
+  "Most typing masters focus on posture, finger placement, and consistency.",
+  "Online typing tests are fun and also track your progress over time.",
+  "Typing without looking at the keyboard is called touch typing.",
+  "The world record for typing speed is over 200 words per minute.",
+  "With patience and dedication, anyone can improve typing speed easily.",
+  "Typing skills are essential for students, professionals, and programmers alike.",
+  "A relaxed mind and correct posture lead to better typing results.",
+  "Focus on accuracy first; speed will come naturally with practice.",
+  "Avoid unnecessary finger movements to increase efficiency and flow.",
+  "Consistent practice builds muscle memory, which boosts typing performance.",
+  "Challenge yourself by typing paragraphs of varying difficulty levels.",
+  "Learning shortcuts and hotkeys also complements typing practice.",
+  "Typing games are a fun way to learn and enjoy the process.",
+  "Always maintain a comfortable typing environment for long practice sessions.",
+  "Track your words per minute to monitor improvement over time.",
+  "Typing fluency can save hours of work in the long run.",
+  "Remember, small daily improvements lead to long-term mastery."
+];
 
-const DICT = (`keyboard javascript function variable object array document browser coding developer performance speed accuracy challenge practice typing game random paragraph online test sample words advanced sample phrase words data stream`).split(' ');
+let timer;
+let timeLeft = 0;
+let totalTime = 0;
+let isRunning = false;
 
-// elements
-const wordsEl = document.getElementById('words');
-const hiddenInput = document.getElementById('hiddenInput');
-const startBtn = document.getElementById('startBtn');
-const restartBtn = document.getElementById('restartBtn');
-const focusBtn = document.getElementById('focusBtn');
-const durationSelect = document.getElementById('duration');
-const modeSelect = document.getElementById('mode');
-
-const timeLeftEl = document.getElementById('timeLeft');
-const wpmEl = document.getElementById('wpm');
-const accuracyEl = document.getElementById('accuracy');
-const correctCountEl = document.getElementById('correctCount');
-const incorrectCountEl = document.getElementById('incorrectCount');
-const progressBar = document.getElementById('progressBar');
-const messageEl = document.getElementById('message');
-const copyResultBtn = document.getElementById('copyResult');
-const saveRecordBtn = document.getElementById('saveRecord');
-
-let words = [];              // array of words to type
-let currentIndex = 0;
-let timer = null;
-let timeLeft = 30;
-let testDuration = 30;
-let started = false;
-let startTime = null;
-let typedChars = 0;
+let currentParagraph = "";
 let correctChars = 0;
-let totalTypedChars = 0;
-let correctWords = 0;
-let incorrectWords = 0;
-let perWordState = []; // 'pending' | 'correct' | 'incorrect'
+let totalTyped = 0;
 
-function generateWords(mode, targetCount=200){
-  const result = [];
-  if(mode === 'words'){
-    // build random words stream
-    while(result.length < targetCount){
-      const w = DICT[Math.floor(Math.random() * DICT.length)];
-      result.push(w);
-    }
-  } else if(mode === 'sentences'){
-    for(let i=0;i<20;i++){
-      const s = WORDS[Math.floor(Math.random()*WORDS.length)];
-      const parts = s.split(' ');
-      result.push(...parts);
-    }
-  } else {
-    // paragraphs: use texts with punctuation
-    const paras = [
-      "Learning to type accurately and quickly is an essential skill. Practice daily to improve your speed.",
-      "Typing drills help build muscle memory. Focus on consistent practice and correct finger placement.",
-      "Effective typing requires patience and repetition. Start slow and increase speed as accuracy improves."
-    ];
-    // break into words
-    const text = paras.join(' ');
-    result.push(...text.replace(/\s+/g,' ').split(' '));
-  }
-  return result;
-}
+const timeEl = document.getElementById("time");
+const wpmEl = document.getElementById("wpm");
+const accuracyEl = document.getElementById("accuracy");
+const inputBox = document.getElementById("inputBox");
+const paragraphEl = document.getElementById("paragraph");
 
-function renderWords(){
-  wordsEl.innerHTML = '';
-  for(let i=0;i<words.length;i++){
-    const span = document.createElement('span');
-    span.className = 'word';
-    if(i === currentIndex) span.classList.add('current');
-    if(perWordState[i] === 'correct') span.classList.add('correct');
-    if(perWordState[i] === 'incorrect') span.classList.add('incorrect');
-    span.textContent = words[i];
-    // caret placement for current word
-    if(i === currentIndex){
-      // append caret
-      const caret = document.createElement('span');
-      caret.className = 'caret';
-      caret.setAttribute('aria-hidden','true');
-      span.appendChild(document.createTextNode(' '));
-      span.appendChild(caret);
-    }
-    wordsEl.appendChild(span);
-  }
-}
-
-function startTest(){
-  // initialize
-  testDuration = parseInt(durationSelect.value,10);
-  timeLeft = testDuration;
-  timeLeftEl.textContent = formatTime(timeLeft);
-  words = generateWords(modeSelect.value, 300);
-  perWordState = new Array(words.length).fill('pending');
-  currentIndex = 0;
-  typedChars = 0;
+function startTest() {
+  clearInterval(timer);
   correctChars = 0;
-  totalTypedChars = 0;
-  correctWords = 0;
-  incorrectWords = 0;
-  started = true;
-  startTime = Date.now();
-  hiddenInput.value = '';
-  hiddenInput.focus();
-  renderWords();
-  updateStats();
-  messageEl.textContent = 'Type the highlighted word. Press space to submit a word. Backspace to correct.';
-  if(timer) clearInterval(timer);
-  timer = setInterval(tick,1000);
-}
+  totalTyped = 0;
 
-function tick(){
-  timeLeft--;
-  if(timeLeft < 0){ endTest(); return; }
-  timeLeftEl.textContent = formatTime(timeLeft);
-  updateStats();
-}
+  totalTime = parseInt(document.getElementById("timeSelect").value);
+  timeLeft = totalTime;
+  timeEl.textContent = timeLeft;
 
-function endTest(){
-  if(timer) { clearInterval(timer); timer = null; }
-  started = false;
-  // compute final WPM based on correctChars and elapsed minutes
-  const elapsedMin = (Date.now() - startTime)/60000 || (testDuration/60);
-  const finalWPM = Math.round((correctChars/5) / (elapsedMin || (testDuration/60)));
-  const finalAccuracy = totalTypedChars === 0 ? 100 : Math.round((correctChars/totalTypedChars)*100);
-  wpmEl.textContent = finalWPM;
-  accuracyEl.textContent = finalAccuracy + '%';
-  messageEl.innerHTML = `<strong>Finished!</strong> WPM: ${finalWPM} | Accuracy: ${finalAccuracy}% | Correct words: ${correctWords} | Incorrect: ${incorrectWords}.`;
-  progressBar.style.width = '100%';
+  currentParagraph = getRandomParagraphs(20);
+  paragraphEl.textContent = currentParagraph;
 
-  // focus off
-  hiddenInput.blur();
-}
+  inputBox.value = "";
+  inputBox.disabled = false;
+  inputBox.focus();
 
-function formatTime(sec){
-  if(sec >= 60){
-    const m = Math.floor(sec/60);
-    const s = sec%60;
-    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  }
-  return '00:' + String(sec).padStart(2,'0');
-}
+  isRunning = true;
 
-function updateStats(){
-  const elapsedMs = Math.max(1, Date.now() - startTime);
-  const elapsedMin = elapsedMs/60000;
-  const wpm = Math.round((correctChars/5)/elapsedMin) || 0;
-  const accuracy = totalTypedChars === 0 ? 100 : Math.round((correctChars/totalTypedChars)*100);
-  const progressPercent = Math.min(100, Math.round((currentIndex / words.length) * 100));
-  wpmEl.textContent = wpm;
-  accuracyEl.textContent = accuracy + '%';
-  correctCountEl.textContent = correctWords;
-  incorrectCountEl.textContent = incorrectWords;
-  progressBar.style.width = progressPercent + '%';
-}
+  timer = setInterval(() => {
+    timeLeft--;
+    timeEl.textContent = timeLeft;
 
-function handleInput(e){
-  if(!started) return;
-  // capture typed value
-  const val = hiddenInput.value;
-  // if user pressed space or enter, submit word
-  if(e.inputType === 'insertText' && val.endsWith(' ') || e.data === ' '){
-    submitWord(val.trim());
-    hiddenInput.value = '';
-    return;
-  }
-  // backspace handling is implicit by editing val
-  // we update character-level stats live (approx)
-  totalTypedChars = totalTypedChars + (e.data ? e.data.length : 0);
-  // For live calculation of correctness for current word, we can compare prefix:
-  // but we only count correctChars when word is submitted to avoid inflated correctChars.
-  updateStats();
-}
-
-function submitWord(typed){
-  if(currentIndex >= words.length) return;
-  const target = words[currentIndex];
-  // char-level accounting
-  totalTypedChars += typed.length;
-  for(let i=0;i<Math.max(typed.length, target.length); i++){
-    if(typed[i] && target[i] && typed[i] === target[i]){
-      correctChars++;
+    if (timeLeft <= 0) {
+      endTest();
     }
-    // else incorrect char, counted in totalTypedChars already
-  }
-  // word correctness
-  if(typed === target){
-    perWordState[currentIndex] = 'correct';
-    correctWords++;
-  } else {
-    perWordState[currentIndex] = 'incorrect';
-    incorrectWords++;
-  }
-  currentIndex++;
-  // if nearing end, generate more words
-  if(currentIndex + 50 > words.length){
-    words = words.concat(generateWords(modeSelect.value, 200));
-    perWordState = perWordState.concat(new Array(200).fill('pending'));
-  }
-  renderWords();
-  updateStats();
+  }, 1000);
 }
 
-function restart(){
-  if(timer) clearInterval(timer);
-  started = false;
-  hiddenInput.value = '';
-  words = [];
-  perWordState = [];
-  currentIndex = 0;
-  timeLeft = parseInt(durationSelect.value,10);
-  timeLeftEl.textContent = formatTime(timeLeft);
-  wpmEl.textContent = 0;
-  accuracyEl.textContent = '100%';
-  correctCountEl.textContent = 0;
-  incorrectCountEl.textContent = 0;
-  progressBar.style.width = '0%';
-  messageEl.textContent = 'Ready — click Start to begin a fresh test.';
-  wordsEl.innerHTML = '';
+function endTest() {
+  clearInterval(timer);
+  inputBox.disabled = true;
+  isRunning = false;
+
+  let words = correctChars / 5;
+  let wpm = Math.round(words / (totalTime / 60));
+  let accuracy = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 0;
+
+  wpmEl.textContent = wpm;
+  accuracyEl.textContent = accuracy + "%";
 }
 
-function copyResult(){
-  const text = messageEl.innerText || '';
-  navigator.clipboard?.writeText(text).then(()=> {
-    alert('Result copied to clipboard');
-  }).catch(()=>{ alert('Copy failed'); });
-}
+inputBox.addEventListener("input", () => {
+  if (!isRunning) return;
 
-function saveRecord(){
-  // store summary in localStorage
-  const sessions = JSON.parse(localStorage.getItem('typingSessions') || '[]');
-  const entry = {
-    date: new Date().toISOString(),
-    duration: testDuration,
-    wpm: wpmEl.textContent,
-    accuracy: accuracyEl.textContent,
-    correctWords: correctCountEl.textContent,
-    incorrectWords: incorrectCountEl.textContent
-  };
-  sessions.push(entry);
-  localStorage.setItem('typingSessions', JSON.stringify(sessions));
-  alert('Session saved locally');
-}
+  let typed = inputBox.value;
+  totalTyped++;
 
-/* Event listeners */
-startBtn.addEventListener('click', ()=>{
-  restart();
-  startTest();
-});
-restartBtn.addEventListener('click', restart);
-focusBtn.addEventListener('click', ()=> hiddenInput.focus());
-hiddenInput.addEventListener('beforeinput', handleInput);
-hiddenInput.addEventListener('input', handleInput);
-
-// keyboard shortcut: space to start if not started
-document.addEventListener('keydown', (e)=>{
-  if(!started && (e.key === ' ' || e.key === 'Enter')) {
-    e.preventDefault();
-    restart();
-    startTest();
+  if (typed[typed.length - 1] === currentParagraph[typed.length - 1]) {
+    correctChars++;
   }
-  // focus hidden input on any key press during test
-  if(started) hiddenInput.focus();
+
+  let words = correctChars / 5;
+  let elapsed = totalTime - timeLeft;
+  let wpm = elapsed > 0 ? Math.round(words / (elapsed / 60)) : 0;
+  let accuracy = Math.round((correctChars / totalTyped) * 100);
+
+  wpmEl.textContent = wpm;
+  accuracyEl.textContent = accuracy + "%";
 });
 
-// copy & save buttons
-copyResultBtn.addEventListener('click', copyResult);
-saveRecordBtn.addEventListener('click', saveRecord);
-
-// initial render
-restart();
+function getRandomParagraphs(n) {
+  let result = [];
+  let copy = [...paragraphs];
+  for (let i = 0; i < n; i++) {
+    let idx = Math.floor(Math.random() * copy.length);
+    result.push(copy[idx]);
+    copy.splice(idx, 1);
+    if (copy.length === 0) copy = [...paragraphs];
+  }
+  return result.join(" ");
+}
 </script>
 </body>
-  </html>
+</html>
