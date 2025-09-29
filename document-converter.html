@@ -3,122 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document Converter</title>
+  <meta name="description" content="Free Online Document Converter - Convert PDF, Word, Excel, and more files easily online.">
+  <meta name="keywords" content="Document Converter, PDF to Word, Word to PDF, Excel to PDF, Online File Converter">
+  <title>Free Online Document Converter Tool</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5faff;
+      color: #333;
       text-align: center;
-      padding: 30px;
-      background: #f3f3f3;
     }
-    h1 {
-      color: #2c3e50;
+    header {
+      background: #2196F3;
+      color: white;
+      padding: 15px;
     }
-    .container {
+    main {
+      max-width: 700px;
+      margin: 20px auto;
       background: #fff;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-      display: inline-block;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     input, select, button {
-      margin: 12px;
+      margin: 10px 0;
       padding: 10px;
-      border-radius: 8px;
+      width: 90%;
       border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
     }
     button {
-      background: #2c3e50;
-      color: #fff;
+      background: #2196F3;
+      color: white;
       cursor: pointer;
+      font-weight: bold;
     }
     button:hover {
-      background: #34495e;
+      background: #1976D2;
+    }
+    footer {
+      background: #222;
+      color: white;
+      padding: 10px;
+      margin-top: 20px;
+    }
+    .ad-box {
+      margin: 20px 0;
+      padding: 10px;
+      background: #e3e3e3;
+      border: 1px dashed #666;
+      text-align: center;
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1>Free Online Document Converter</h1>
+  </header>
 
-  <h1>📄 Document Converter</h1>
-  <div class="container">
-    <input type="file" id="fileInput" accept=".doc,.docx,.pdf,.txt,.xlsx,.pptx,.png,.jpg,.jpeg"><br>
-    
-    <label for="format">Convert to:</label>
-    <select id="format">
-      <option value="pdf">PDF</option>
-      <option value="txt">TXT</option>
-      <option value="docx">DOCX</option>
-    </select><br>
+  <main>
+    <p>Convert PDF, Word, Excel, and other document formats easily and instantly online.</p>
 
-    <button onclick="convertDocument()">Convert</button>
-    <p id="status"></p>
-  </div>
+    <div class="ad-box">[Your Ad Here]</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <input type="file" id="fileUpload" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt">
+    <select id="targetFormat">
+      <option value="pdf">Convert to PDF</option>
+      <option value="docx">Convert to Word (.docx)</option>
+      <option value="xlsx">Convert to Excel (.xlsx)</option>
+      <option value="txt">Convert to Text (.txt)</option>
+    </select>
+    <button onclick="convertDocument()">Convert Document</button>
+
+    <a id="downloadLink" style="display:none;" download>Download Converted File</a>
+
+    <div class="ad-box">[Your Ad Here]</div>
+  </main>
+
+  <footer>
+    <p>© 2025 All-in-One Tools | Free Online Document Converter</p>
+  </footer>
 
   <script>
     async function convertDocument() {
-      let fileInput = document.getElementById("fileInput");
-      let format = document.getElementById("format").value;
-      let status = document.getElementById("status");
+      const fileInput = document.getElementById("fileUpload");
+      const targetFormat = document.getElementById("targetFormat").value;
 
       if (!fileInput.files.length) {
-        status.innerText = "⚠️ Please select a file!";
+        alert("Please upload a file first!");
         return;
       }
 
-      let file = fileInput.files[0];
-      let fileName = file.name.split(".")[0];
-      let reader = new FileReader();
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+      formData.append("targetFormat", targetFormat);
 
-      reader.onload = async function(e) {
-        let arrayBuffer = e.target.result;
+      const downloadLink = document.getElementById("downloadLink");
+      downloadLink.style.display = "none";
+      downloadLink.textContent = "Processing...";
 
-        if (file.name.endsWith(".docx") && format === "txt") {
-          // DOCX ➝ TXT
-          mammoth.extractRawText({arrayBuffer: arrayBuffer})
-            .then(function(result) {
-              downloadFile(result.value, fileName + ".txt");
-            });
-        } 
-        else if (file.name.endsWith(".txt") && format === "pdf") {
-          // TXT ➝ PDF
-          const pdfDoc = await PDFLib.PDFDocument.create();
-          const page = pdfDoc.addPage([600, 800]);
-          page.drawText(new TextDecoder().decode(arrayBuffer), {x: 50, y: 750, size: 12});
-          const pdfBytes = await pdfDoc.save();
-          downloadFile(pdfBytes, fileName + ".pdf", true);
-        }
-        else if (file.name.endsWith(".xlsx") && format === "txt") {
-          // Excel ➝ TXT
-          let workbook = XLSX.read(arrayBuffer, {type:"array"});
-          let sheetName = workbook.SheetNames[0];
-          let sheet = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
-          downloadFile(sheet, fileName + ".txt");
-        }
-        else {
-          status.innerText = "❌ Conversion not supported yet!";
-        }
-      };
+      try {
+        // Replace this URL with your actual document conversion API endpoint
+        const response = await fetch("https://example.com/api/document-convert", {
+          method: "POST",
+          body: formData
+        });
 
-      reader.readAsArrayBuffer(file);
-    }
+        if (!response.ok) throw new Error("Conversion failed!");
 
-    function downloadFile(data, filename, isBinary=false) {
-      let blob;
-      if (isBinary) {
-        blob = new Blob([data], { type: "application/pdf" });
-      } else {
-        blob = new Blob([data], { type: "text/plain" });
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        downloadLink.href = url;
+        downloadLink.download = `converted.${targetFormat}`;
+        downloadLink.style.display = "block";
+        downloadLink.textContent = "Download Converted File";
+
+      } catch (error) {
+        alert("Error: " + error.message);
       }
-      let link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
     }
   </script>
-
 </body>
 </html>
