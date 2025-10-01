@@ -1,157 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paragraph Typing Practice | Improve Typing Speed</title>
-<meta name="description" content="Practice typing paragraphs online with our free Paragraph Typing Practice tool. Get real-time WPM and accuracy. Mobile-friendly and responsive.">
-<meta name="keywords" content="Paragraph Typing Practice, Typing Practice Online, Improve Typing Speed, Typing Accuracy, Online Typing Tool, Free Typing Practice">
-<meta name="robots" content="index, follow">
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0d6efd, #ffffff);
-  margin: 0;
-  padding: 20px;
-  text-align: center;
-}
-h1, h2 {
-  color: #2c3e50;
-  margin-bottom: 10px;
-}
-.container {
-  background: #fff;
-  max-width: 700px;
-  margin: auto;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  text-align: left;
-}
-textarea, button {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 8px;
-  border: 2px solid #0d6efd;
-  font-size: 16px;
-}
-button {
-  background: #0d6efd;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-button:hover {
-  background: #0b5ed7;
-}
-#paragraph {
-  background: #f0f8ff;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  min-height: 100px;
-}
-.stats {
-  margin-top: 10px;
-  font-weight: bold;
-  color: #2c3e50;
-}
-.ads {
-  margin: 15px 0;
-  text-align: center;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paragraph Typing Practice</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fdf6e3;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background: #ffcc00;
+      color: #333;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 20px;
+    }
+    .left, .right {
+      width: 48%;
+      background: #fff8dc;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .passage {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #444;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 250px;
+      font-size: 16px;
+      padding: 10px;
+      border: 2px solid #ffcc00;
+      border-radius: 8px;
+      outline: none;
+      resize: none;
+    }
+    .stats {
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #222;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 18px;
+      background: #ffcc00;
+      color: #000;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #ffdb4d;
+    }
+  </style>
 </head>
 <body>
+  <header>Paragraph Typing Practice - 6 Minute Challenge</header>
 
-<h1>✍️ Paragraph Typing Practice</h1>
-<h2>Practice typing different paragraphs online</h2>
+  <div class="container">
+    <!-- Left Side -->
+    <div class="left">
+      <div id="passage" class="passage"></div>
+      <button class="btn" onclick="loadNewPassage()">🔄 New Passage</button>
+    </div>
 
-<!-- 🔹 Top Ad -->
-<div class="ads">
-<script type="text/javascript">
-  atOptions = {'key':'a4236a38fef8b51c08a860f7e29b1a32','format':'iframe','height':90,'width':728,'params':{}};
-</script>
-<script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
-</div>
+    <!-- Right Side -->
+    <div class="right">
+      <textarea id="typingArea" placeholder="Start typing here..." disabled></textarea>
+      <div class="stats">
+        ⏳ Time Left: <span id="time">06:00</span> <br>
+        📄 Words Typed: <span id="words">0</span> <br>
+        ⚡ WPM: <span id="wpm">0</span>
+      </div>
+      <button class="btn" onclick="startPractice()">▶ Start Practice</button>
+    </div>
+  </div>
 
-<div class="container">
-  <button onclick="startPractice()">Start Practice</button>
+  <script>
+    const passages = [
+      "Typing fast is not about rushing, but about accuracy and rhythm.",
+      "Practice typing daily to improve your speed and reduce errors.",
+      "Consistency is the key to mastering any skill, including typing.",
+      "Many people type using only a few fingers, but touch typing is faster.",
+      "Typing with proper posture helps prevent long-term hand strain.",
+      "The quick brown fox jumps over the lazy dog is a famous typing sentence.",
+      "Your typing progress depends on focus, patience, and dedication.",
+      "Avoid looking at the keyboard while typing to boost your memory.",
+      "Good typing speed can save you hours of work in the long run.",
+      "Typing practice is most effective when done regularly for short periods.",
+      "Errors in typing are natural; correcting them helps you learn faster.",
+      "Technology has made fast typing a necessary skill in daily life.",
+      "Typing tests help track your growth and encourage consistency.",
+      "Every professional benefits from good typing speed and accuracy.",
+      "Typing games are fun and improve both speed and accuracy together.",
+      "Accuracy matters more than speed in the beginning of typing practice.",
+      "Focus on typing without mistakes, speed will come with time.",
+      "Typing with all fingers distributes workload and increases efficiency.",
+      "Improving typing speed requires discipline and mindful practice.",
+      "Stay relaxed while typing; tension reduces your overall performance."
+    ];
 
-  <div id="paragraph"></div>
-  <textarea id="inputArea" placeholder="Start typing here..." disabled></textarea>
-  <div class="stats" id="stats">WPM: 0 | Accuracy: 0%</div>
-</div>
+    let timer, timeLeft = 360, started = false;
 
-<!-- 🔹 Middle Ad -->
-<div class="ads">
-<script type="text/javascript">
-  atOptions = {'key':'8a02d9520d2faa074d27d1b1582d7bf6','format':'iframe','height':250,'width':300,'params':{}};
-</script>
-<script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
-</div>
+    function loadNewPassage() {
+      const passageElement = document.getElementById("passage");
+      const randomIndex = Math.floor(Math.random() * passages.length);
+      passageElement.textContent = passages[randomIndex];
+    }
 
-<!-- 🔹 Bottom Ad -->
-<div class="ads">
-<script type="text/javascript">
-  atOptions = {'key':'496188380e746eef901d9058c8f77c85','format':'iframe','height':60,'width':468,'params':{}};
-</script>
-<script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
-</div>
+    function startPractice() {
+      if (started) return;
+      started = true;
+      loadNewPassage();
+      document.getElementById("typingArea").disabled = false;
+      document.getElementById("typingArea").focus();
 
-<script>
-const paragraphs = [
-  "The quick brown fox jumps over the lazy dog to test your typing skills.",
-  "Learning to type accurately and quickly is an essential skill for everyone.",
-  "Practice regularly to improve your typing speed and maintain accuracy.",
-  "Typing practice helps enhance focus, concentration, and keyboard efficiency.",
-  "Consistent practice with different paragraphs builds confidence in typing."
-];
+      timer = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          document.getElementById("typingArea").disabled = true;
+          alert("⏰ Time's up! Great job!");
+        } else {
+          timeLeft--;
+          updateStats();
+        }
+      }, 1000);
 
-let interval, startTime, wordsTyped = 0;
+      document.getElementById("typingArea").addEventListener("input", updateStats);
+    }
 
-function getRandomParagraph() {
-  return paragraphs[Math.floor(Math.random() * paragraphs.length)];
-}
+    function updateStats() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      document.getElementById("time").textContent =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-function startPractice() {
-  document.getElementById('inputArea').value = '';
-  document.getElementById('stats').innerText = "WPM: 0 | Accuracy: 0%";
-  document.getElementById('paragraph').innerText = getRandomParagraph();
-  document.getElementById('inputArea').disabled = false;
-  document.getElementById('inputArea').focus();
-  wordsTyped = 0;
-  startTime = Date.now();
+      const text = document.getElementById("typingArea").value.trim();
+      const words = text.length > 0 ? text.split(/\s+/).length : 0;
+      document.getElementById("words").textContent = words;
 
-  if(interval) clearInterval(interval);
-  interval = setInterval(updateStats, 1000);
-}
-
-function updateStats() {
-  const typed = document.getElementById('inputArea').value;
-  const para = document.getElementById('paragraph').innerText;
-  const typedWords = typed.trim().split(/\s+/).length;
-  wordsTyped = typedWords;
-
-  // Accuracy calculation
-  let correctChars = 0;
-  for(let i=0;i<typed.length;i++){
-    if(typed[i] === para[i]) correctChars++;
-  }
-  const accuracy = typed.length === 0 ? 0 : Math.round((correctChars/typed.length)*100);
-  const elapsedMinutes = (Date.now() - startTime)/60000;
-  const wpm = Math.round(wordsTyped/elapsedMinutes);
-
-  document.getElementById('stats').innerText = `WPM: ${wpm} | Accuracy: ${accuracy}%`;
-
-  // If user finishes paragraph, load new one
-  if(typed.length >= para.length) {
-    document.getElementById('paragraph').innerText = getRandomParagraph();
-    document.getElementById('inputArea').value = '';
-  }
-}
-</script>
-
+      const elapsed = 360 - timeLeft;
+      const wpm = elapsed > 0 ? Math.round((words / elapsed) * 60) : 0;
+      document.getElementById("wpm").textContent = wpm;
+    }
+  </script>
 </body>
 </html>
