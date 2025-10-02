@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Note Pad — Free Online Plain Text Editor | All-in-One Tools</title>
+  <meta name="description" content="Free online Notepad (plain text editor). Autosave, export/import, download .txt, word & character counter. Mobile-friendly & responsive." />
+  <meta name="keywords" content="Notepad, Online Notepad, Plain Text Editor, Save Text Online, Export Text" />
+  <meta property="og:title" content="Note Pad — Free Online Plain Text Editor" />
+  <meta property="og:description" content="Fast, simple online notepad with autosave, export/import, and download features." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="" />
+  <meta name="robots" content="index, follow" />
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+
+  <style>
+    :root{
+      --bg:#fffdfa;
+      --card:#fff;
+      --accent:#ffb703; /* warm/yellow accent */
+      --muted:#667085;
+      --shadow: 0 8px 24px rgba(16,24,40,0.06);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color-scheme: light;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#fffdfa 0%, #fff 100%);-webkit-font-smoothing:antialiased}
+    header{padding:18px; background:linear-gradient(90deg,var(--accent),#ffcf46); color:#000; box-shadow:var(--shadow)}
+    .wrap{max-width:1100px;margin:18px auto;padding:0 16px}
+    header .brand{display:flex;align-items:center;gap:12px}
+    header h1{margin:0;font-size:1.1rem}
+    header p{margin:2px 0 0;font-size:.9rem;color:rgba(0,0,0,0.7)}
+
+    /* top ad placeholder */
+    .top-ad{margin:14px auto;text-align:center}
+
+    .tool-card{background:var(--card);border-radius:12px;padding:14px;margin-top:14px;box-shadow:var(--shadow)}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .toolbar .left, .toolbar .right{display:flex;gap:8px;align-items:center}
+    .toolbar .right{margin-left:auto}
+
+    button, select, input[type="search"]{padding:8px 10px;border-radius:8px;border:1px solid rgba(15,23,42,0.06);background:transparent;cursor:pointer;font-weight:600}
+    button.primary{background:var(--accent);border:none;color:#000}
+    button.ghost{background:transparent}
+    .controls small{color:var(--muted);font-size:.9rem}
+
+    /* editor area */
+    #editor {
+      width:100%;
+      min-height:420px;
+      max-height:70vh;
+      padding:14px;
+      border-radius:10px;
+      border:1px solid rgba(15,23,42,0.04);
+      background:linear-gradient(180deg,#fff,#fffefa);
+      resize:vertical;
+      font-size:15px;
+      line-height:1.6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+      overflow:auto;
+      outline:none;
+    }
+
+    .stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+    .stat{background:linear-gradient(180deg,#fff,#fffaf0);padding:10px;border-radius:8px;border:1px solid rgba(15,23,42,0.03);font-weight:700;color:var(--muted);font-size:.95rem}
+
+    .bottom-ad{margin-top:18px;text-align:center}
+
+    footer{margin:20px auto 40px;max-width:1100px;text-align:center;color:var(--muted);font-size:.95rem;padding:6px}
+
+    /* responsive */
+    @media (max-width:720px){
+      .toolbar{flex-direction:column;align-items:stretch}
+      .toolbar .right{margin-left:0;justify-content:space-between}
+      #editor{min-height:320px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <div style="width:44px;height:44px;border-radius:10px;background:#fff;padding:6px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#000">NP</div>
+        <div>
+          <h1>Note Pad — Plain Text Editor</h1>
+          <p>Fast, private (local) notepad. Autosave, export/import, download .txt — works offline.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Ad: 728x90 -->
+  <div class="top-ad">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+  </div>
+
+  <div class="wrap">
+    <div class="tool-card" role="region" aria-label="Note Pad">
+      <div class="toolbar" style="margin-bottom:12px">
+        <div class="left">
+          <button id="newBtn" class="ghost" title="New" aria-label="New">New</button>
+          <button id="saveBtn" class="primary" title="Save (local)">Save</button>
+          <button id="downloadBtn" title="Download .txt">Download</button>
+          <button id="exportJson" title="Export JSON">Export</button>
+          <button id="importJson" title="Import JSON">Import</button>
+          <input type="file" id="importFile" accept="application/json" style="display:none">
+        </div>
+
+        <div class="right">
+          <label class="controls small">Find: <input type="search" id="findInput" placeholder="find text"></label>
+          <label class="controls small">Replace: <input type="search" id="replaceInput" placeholder="replace with"></label>
+          <button id="replaceBtn">Replace</button>
+          <select id="autosaveInterval" title="Autosave interval">
+            <option value="0">Autosave Off</option>
+            <option value="5000">Every 5s</option>
+            <option value="15000" selected>Every 15s</option>
+            <option value="30000">Every 30s</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Editor -->
+      <div id="editor" contenteditable="true" spellcheck="true" aria-multiline="true" role="textbox">
+<pre style="margin:0;white-space:pre-wrap">Welcome to Note Pad — your private plain-text editor.
+Type anything here. This content is saved locally in your browser unless you clear it.</pre>
+      </div>
+
+      <div class="stats" aria-live="polite">
+        <div class="stat">Words: <span id="wordCount">0</span></div>
+        <div class="stat">Characters: <span id="charCount">0</span></div>
+        <div class="stat">Lines: <span id="lineCount">0</span></div>
+        <div class="stat">Last Saved: <span id="lastSaved">Never</span></div>
+      </div>
+
+      <!-- Middle Ad -->
+      <div style="margin-top:14px;text-align:center">
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+      </div>
+    </div>
+
+    <!-- Bottom ad -->
+    <div class="bottom-ad">
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '496188380e746eef901d9058c8f77c85',
+          'format' : 'iframe',
+          'height' : 60,
+          'width' : 468,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+    </div>
+  </div>
+
+  <footer>
+    © <span id="year"></span> All-in-One Tools · Notepad — Your data stays in your browser unless you export it.
+  </footer>
+
+  <script>
+    // Basic constants & helpers
+    const LS_KEY = 'aio_notepad_plain';
+    const editor = document.getElementById('editor');
+    const wordCount = document.getElementById('wordCount');
+    const charCount = document.getElementById('charCount');
+    const lineCount = document.getElementById('lineCount');
+    const lastSaved = document.getElementById('lastSaved');
+    const saveBtn = document.getElementById('saveBtn');
+    const newBtn = document.getElementById('newBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const exportJson = document.getElementById('exportJson');
+    const importJsonBtn = document.getElementById('importJson');
+    const importFile = document.getElementById('importFile');
+    const findInput = document.getElementById('findInput');
+    const replaceInput = document.getElementById('replaceInput');
+    const replaceBtn = document.getElementById('replaceBtn');
+    const autosaveSelect = document.getElementById('autosaveInterval');
+
+    // init year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // load from localStorage if exists
+    function loadFromLS(){
+      try{
+        const data = localStorage.getItem(LS_KEY);
+        if(data){
+          editor.innerText = data;
+          updateStats();
+          lastSaved.textContent = new Date().toLocaleString();
+        }
+      }catch(e){ console.warn('load failed', e) }
+    }
+
+    // save to localStorage
+    function saveToLS(){
+      try{
+        const text = editor.innerText;
+        localStorage.setItem(LS_KEY, text);
+        lastSaved.textContent = new Date().toLocaleString();
+      }catch(e){ console.warn('save failed', e) }
+    }
+
+    // update word/char/line counts
+    function updateStats(){
+      const text = editor.innerText || '';
+      const chars = text.replace(/\r/g,'').length;
+      const words = text.trim().length ? text.trim().split(/\s+/).length : 0;
+      const lines = text.split(/\n/).length;
+      charCount.textContent = chars;
+      wordCount.textContent = words;
+      lineCount.textContent = lines;
+    }
+
+    // event handlers
+    editor.addEventListener('input', ()=>{
+      updateStats();
+    });
+
+    saveBtn.addEventListener('click', ()=> {
+      saveToLS();
+      alert('Saved locally');
+    });
+
+    newBtn.addEventListener('click', ()=>{
+      if(confirm('Clear editor and start new?')){ editor.innerText=''; updateStats(); saveToLS(); }
+    });
+
+    downloadBtn.addEventListener('click', ()=>{
+      const blob = new Blob([editor.innerText || ''], {type:'text/plain'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'note.txt'; a.click();
+    });
+
+    exportJson.addEventListener('click', ()=>{
+      const payload = { text: editor.innerText || '', savedAt: new Date().toISOString() };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'notepad-backup.json'; a.click();
+    });
+
+    importJsonBtn.addEventListener('click', ()=> importFile.click());
+    importFile.addEventListener('change', (ev)=>{
+      const file = ev.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e){
+        try{
+          const data = JSON.parse(e.target.result);
+          if(data && typeof data.text === 'string'){
+            if(confirm('Import will replace current editor content. Continue?')){
+              editor.innerText = data.text;
+              updateStats();
+              saveToLS();
+              alert('Imported');
+            }
+          } else alert('Invalid JSON format.');
+        }catch(err){ alert('Failed to parse JSON'); }
+      };
+      reader.readAsText(file);
+    });
+
+    // find & replace
+    replaceBtn.addEventListener('click', ()=>{
+      const find = findInput.value;
+      const rep = replaceInput.value;
+      if(!find) return alert('Enter text to find');
+      const content = editor.innerText;
+      const replaced = content.split(find).join(rep);
+      editor.innerText = replaced;
+      updateStats();
+      saveToLS();
+      alert('Replace complete');
+    });
+
+    // autosave interval
+    let autosaveTimer = null;
+    function setAutosave(ms){
+      if(autosaveTimer) clearInterval(autosaveTimer);
+      if(ms && ms > 0) autosaveTimer = setInterval(()=> saveToLS(), ms);
+    }
+    autosaveSelect.addEventListener('change', (e)=> setAutosave(Number(e.target.value)));
+    setAutosave(Number(autosaveSelect.value));
+
+    // keyboard shortcuts: Ctrl+S to save, Ctrl+Shift+S to export json
+    document.addEventListener('keydown', (e)=>{
+      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){
+        e.preventDefault();
+        saveToLS();
+        alert('Saved locally (Ctrl+S)');
+      }
+      if((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 's'){
+        e.preventDefault();
+        exportJson.click();
+      }
+    });
+
+    // load initial content
+    loadFromLS();
+    updateStats();
+
+    // accessibility: ensure editor is focusable and editable on click
+    editor.addEventListener('focus', ()=> editor.classList.add('focus'));
+    editor.addEventListener('blur', ()=> editor.classList.remove('focus'));
+
+    // safety: warn before leaving page if unsaved changes (we autosave, but still)
+    let isSaved = true;
+    editor.addEventListener('input', ()=> isSaved = false);
+    window.addEventListener('beforeunload', (e)=>{
+      // if changes exist, save and show prompt
+      if(!isSaved){
+        saveToLS();
+        isSaved = true;
+      }
+    });
+  </script>
+</body>
+</html>
