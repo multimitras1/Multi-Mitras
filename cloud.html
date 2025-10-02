@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Sync Tool - Notes & Tasks Online</title>
+  <meta name="description" content="Sync your Sticky Notes and Tasks across devices using this Cloud Sync Tool. Backup, restore, search, and manage your productivity notes online.">
+  <meta name="keywords" content="cloud sync, notes sync, tasks sync, backup restore, sticky notes, to-do list, online productivity tool">
+  <meta property="og:title" content="Cloud Sync Tool - Notes & Tasks Online" />
+  <meta property="og:description" content="Manage and sync your Sticky Notes & Tasks online with backup and restore options. Free Cloud Sync Tool for productivity." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://yourwebsite.com/cloud-sync-tool" />
+  <meta property="og:image" content="https://yourwebsite.com/cloud-sync-preview.png" />
+  
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; background:#e8f0fe; }
+    header { background:#00bfff; color:#fff; padding:15px; text-align:center; font-size:24px; font-weight:bold; position:sticky; top:0; z-index:1000; }
+    .ad { text-align:center; margin:10px 0; }
+    .container { max-width:900px; margin:20px auto; padding:0 15px; }
+    .section { margin-bottom:30px; background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .section h2 { margin-top:0; color:#00bfff; }
+    input, textarea, button { padding:8px; border-radius:6px; border:1px solid #ccc; margin:5px 0; }
+    button { background:#00bfff; color:#fff; border:none; cursor:pointer; font-weight:bold; }
+    .list { list-style:none; padding:0; }
+    .list li { display:flex; justify-content:space-between; align-items:center; padding:10px; margin-bottom:8px; border-radius:6px; background:#f0f8ff; }
+    .list li.completed { text-decoration:line-through; opacity:0.6; }
+    footer { text-align:center; background:#222; color:#fff; padding:20px; margin-top:20px; }
+    @media(max-width:768px){ .container{ padding:0 10px; } }
+  </style>
+</head>
+<body>
+  <header>☁️ Cloud Sync Tool - Notes & Tasks</header>
+
+  <!-- Top Ad -->
+  <div class="ad">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+  </div>
+
+  <div class="container">
+    <!-- Sticky Notes Section -->
+    <div class="section">
+      <h2>Sticky Notes</h2>
+      <input type="text" id="noteInput" placeholder="Enter new note">
+      <button onclick="addNote()">Add Note</button>
+      <button onclick="exportNotes()">Export Notes</button>
+      <button onclick="importNotes()">Import Notes</button>
+      <input type="file" id="importNotesFile" style="display:none" accept=".json">
+      <ul class="list" id="notesList"></ul>
+    </div>
+
+    <!-- Tasks Section -->
+    <div class="section">
+      <h2>Tasks</h2>
+      <input type="text" id="taskInput" placeholder="Enter new task">
+      <button onclick="addTask()">Add Task</button>
+      <button onclick="exportTasks()">Export Tasks</button>
+      <button onclick="importTasks()">Import Tasks</button>
+      <input type="file" id="importTasksFile" style="display:none" accept=".json">
+      <ul class="list" id="tasksList"></ul>
+    </div>
+  </div>
+
+  <!-- Middle Ad -->
+  <div class="ad">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+  </div>
+
+  <footer>© 2025 Cloud Sync Tool | All rights reserved.</footer>
+
+  <script>
+    // Notes
+    let notes = JSON.parse(localStorage.getItem("cloudNotes")) || [];
+    const notesList = document.getElementById("notesList");
+
+    function saveNotes(){ localStorage.setItem("cloudNotes", JSON.stringify(notes)); }
+    function renderNotes(){
+      notesList.innerHTML="";
+      notes.forEach((note,index)=>{
+        const li=document.createElement("li");
+        li.textContent=note.text;
+        if(note.completed) li.classList.add("completed");
+        li.onclick = ()=>{ toggleNote(index); };
+        const delBtn=document.createElement("button");
+        delBtn.textContent="🗑";
+        delBtn.onclick=()=>{ deleteNote(index); event.stopPropagation(); };
+        li.appendChild(delBtn);
+        notesList.appendChild(li);
+      });
+    }
+
+    function addNote(){
+      const input=document.getElementById("noteInput");
+      const text=input.value.trim();
+      if(!text) return alert("Enter a note!");
+      notes.push({text:text, completed:false});
+      input.value='';
+      saveNotes();
+      renderNotes();
+    }
+
+    function toggleNote(index){ notes[index].completed=!notes[index].completed; saveNotes(); renderNotes(); }
+    function deleteNote(index){ notes.splice(index,1); saveNotes(); renderNotes(); }
+
+    function exportNotes(){
+      const blob=new Blob([JSON.stringify(notes,null,2)],{type:"application/json"});
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="cloud-notes.json";
+      a.click();
+    }
+
+    function importNotes(){ document.getElementById("importNotesFile").click(); }
+    document.getElementById("importNotesFile").addEventListener("change",function(){
+      const file=this.files[0];
+      if(file){
+        const reader=new FileReader();
+        reader.onload=function(e){
+          notes=JSON.parse(e.target.result);
+          saveNotes();
+          renderNotes();
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    renderNotes();
+
+    // Tasks
+    let tasks = JSON.parse(localStorage.getItem("cloudTasks")) || [];
+    const tasksList = document.getElementById("tasksList");
+
+    function saveTasks(){ localStorage.setItem("cloudTasks", JSON.stringify(tasks)); }
+    function renderTasks(){
+      tasksList.innerHTML="";
+      tasks.forEach((task,index)=>{
+        const li=document.createElement("li");
+        li.textContent=task.text;
+        if(task.completed) li.classList.add("completed");
+        li.onclick=()=>{ toggleTask(index); };
+        const delBtn=document.createElement("button");
+        delBtn.textContent="🗑";
+        delBtn.onclick=()=>{ deleteTask(index); event.stopPropagation(); };
+        li.appendChild(delBtn);
+        tasksList.appendChild(li);
+      });
+    }
+
+    function addTask(){
+      const input=document.getElementById("taskInput");
+      const text=input.value.trim();
+      if(!text) return alert("Enter a task!");
+      tasks.push({text:text, completed:false});
+      input.value='';
+      saveTasks();
+      renderTasks();
+    }
+
+    function toggleTask(index){ tasks[index].completed=!tasks[index].completed; saveTasks(); renderTasks(); }
+    function deleteTask(index){ tasks.splice(index,1); saveTasks(); renderTasks(); }
+
+    function exportTasks(){
+      const blob=new Blob([JSON.stringify(tasks,null,2)],{type:"application/json"});
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="cloud-tasks.json";
+      a.click();
+    }
+
+    function importTasks(){ document.getElementById("importTasksFile").click(); }
+    document.getElementById("importTasksFile").addEventListener("change",function(){
+      const file=this.files[0];
+      if(file){
+        const reader=new FileReader();
+        reader.onload=function(e){
+          tasks=JSON.parse(e.target.result);
+          saveTasks();
+          renderTasks();
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    renderTasks();
+  </script>
+</body>
+</html>
