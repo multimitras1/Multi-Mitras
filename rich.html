@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rich Text Editor — Advanced Notepad | All-in-One Tools</title>
+  <meta name="description" content="Rich Text Editor (Advanced Notepad) — format text, insert images/links, autosave, export/import, download HTML. Mobile-friendly and responsive." />
+  <meta name="keywords" content="Rich Text Editor, Online Notepad, WYSIWYG Editor, Save HTML, Export Notepad" />
+  <meta property="og:title" content="Rich Text Editor — Advanced Notepad" />
+  <meta property="og:description" content="Online rich text editor with formatting, autosave, export/import, and download options." />
+  <meta name="robots" content="index, follow" />
+  <style>
+    :root{
+      --bg:#fffaf0;
+      --card:#fff;
+      --accent:#ffb703;
+      --muted:#6b7280;
+      --shadow: 0 8px 28px rgba(16,24,40,0.06);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#fffaf0 0%, #fff 100%);-webkit-font-smoothing:antialiased}
+    header{padding:18px;background:linear-gradient(90deg,var(--accent),#ffd54a);color:#1f2937;box-shadow:var(--shadow)}
+    .wrap{max-width:1100px;margin:18px auto;padding:0 16px}
+    header .brand{display:flex;align-items:center;gap:12px}
+    header h1{margin:0;font-size:1.1rem}
+    header p{margin:2px 0 0;font-size:.9rem;color:rgba(0,0,0,0.65)}
+
+    .top-ad{margin:14px auto;text-align:center}
+
+    .card{background:var(--card);border-radius:12px;padding:14px;margin-top:14px;box-shadow:var(--shadow)}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .tool-left{display:flex;gap:8px;align-items:center}
+    .tool-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+    button, select, input[type="file"]{padding:8px 10px;border-radius:8px;border:1px solid rgba(15,23,42,0.06);background:transparent;cursor:pointer;font-weight:600}
+    button.primary{background:var(--accent);border:none;color:#000}
+    .small{font-size:.9rem;color:var(--muted)}
+
+    /* editor area */
+    #editor {
+      width:100%;
+      min-height:420px;
+      max-height:70vh;
+      padding:18px;
+      border-radius:10px;
+      border:1px solid rgba(15,23,42,0.04);
+      background:linear-gradient(180deg,#fff,#fffef0);
+      overflow:auto;
+      outline:none;
+    }
+
+    /* stats */
+    .stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+    .stat{background:linear-gradient(180deg,#fff,#fffaf0);padding:10px;border-radius:8px;border:1px solid rgba(15,23,42,0.03);font-weight:700;color:var(--muted);font-size:.95rem}
+
+    .middle-ad{margin-top:14px;text-align:center}
+    .bottom-ad{margin-top:18px;text-align:center}
+
+    /* responsive */
+    @media (max-width:720px){
+      .toolbar{flex-direction:column;align-items:stretch}
+      .tool-right{margin-left:0;justify-content:space-between}
+      #editor{min-height:320px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <div style="width:44px;height:44px;border-radius:10px;background:#fff;padding:6px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#000">RT</div>
+        <div>
+          <h1>Rich Text Editor — Advanced Notepad</h1>
+          <p>Create, format, and export rich content. Autosave & import/export supported.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Ad -->
+  <div class="top-ad">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+  </div>
+
+  <div class="wrap">
+    <div class="card" role="region" aria-label="Rich Text Editor">
+
+      <div class="toolbar" aria-hidden="false">
+        <div class="tool-left">
+          <button onclick="exec('undo')" title="Undo (Ctrl+Z)">⤺</button>
+          <button onclick="exec('redo')" title="Redo (Ctrl+Y)">⤻</button>
+
+          <button onclick="exec('bold')" title="Bold (Ctrl/Cmd+B)">B</button>
+          <button onclick="exec('italic')" title="Italic (Ctrl/Cmd+I)"><i>I</i></button>
+          <button onclick="exec('underline')" title="Underline (Ctrl/Cmd+U)"><u>U</u></button>
+          <button onclick="exec('strikeThrough')" title="Strikethrough">S̶</button>
+
+          <select id="heading" onchange="applyHeading(this.value)">
+            <option value="">Paragraph</option>
+            <option value="h1">Heading 1</option>
+            <option value="h2">Heading 2</option>
+            <option value="h3">Heading 3</option>
+          </select>
+
+          <select id="fontSize" onchange="exec('fontSize', this.value)">
+            <option value="3">14px</option>
+            <option value="4" selected>16px</option>
+            <option value="5">18px</option>
+            <option value="6">20px</option>
+          </select>
+
+          <select id="fontName" onchange="exec('fontName', this.value)">
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana" selected>Verdana</option>
+            <option value="Courier New">Courier New</option>
+          </select>
+
+          <button onclick="exec('insertUnorderedList')" title="Bulleted list">• List</button>
+          <button onclick="exec('insertOrderedList')" title="Numbered list">1. List</button>
+
+          <button onclick="exec('justifyLeft')">L</button>
+          <button onclick="exec('justifyCenter')">C</button>
+          <button onclick="exec('justifyRight')">R</button>
+
+          <button onclick="createLink()" title="Insert link">🔗</button>
+          <input type="file" id="imageInput" accept="image/*" title="Insert image" style="display:inline-block" />
+        </div>
+
+        <div class="tool-right">
+          <button id="saveBtn" class="primary">Save</button>
+          <button id="exportHtml">Export HTML</button>
+          <button id="downloadHtml">Download .html</button>
+          <button id="exportJson">Export JSON</button>
+          <button id="importJson">Import JSON</button>
+          <input type="file" id="importFile" accept="application/json" style="display:none" />
+        </div>
+      </div>
+
+      <!-- Editor -->
+      <div id="editor" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true" tabindex="0">
+        <h2 style="margin-top:0">Welcome — Rich Notepad</h2>
+        <p>Start typing. Use the toolbar to format text, insert images and links. Your content is saved locally automatically (configurable).</p>
+      </div>
+
+      <div class="stats" aria-live="polite">
+        <div class="stat">Words: <span id="wordCount">0</span></div>
+        <div class="stat">Characters: <span id="charCount">0</span></div>
+        <div class="stat">Paragraphs: <span id="paraCount">0</span></div>
+        <div class="stat">Last Saved: <span id="lastSaved">Never</span></div>
+      </div>
+
+      <!-- Middle Ad -->
+      <div class="middle-ad">
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+      </div>
+
+    </div>
+
+    <!-- Bottom ad -->
+    <div class="bottom-ad">
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '496188380e746eef901d9058c8f77c85',
+          'format' : 'iframe',
+          'height' : 60,
+          'width' : 468,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/496188380e746eef901d9058c8f77c85/invoke.js"></script>
+    </div>
+
+  </div>
+
+  <footer style="max-width:1100px;margin:18px auto;padding:8px;text-align:center;color:var(--muted)">
+    © <span id="year"></span> All-in-One Tools — Rich Notepad. Your data stays local unless you export it.
+  </footer>
+
+  <script>
+    // Constants / Keys
+    const LS_KEY = 'aio_rich_notepad_v1';
+    const editor = document.getElementById('editor');
+    const wordCount = document.getElementById('wordCount');
+    const charCount = document.getElementById('charCount');
+    const paraCount = document.getElementById('paraCount');
+    const lastSaved = document.getElementById('lastSaved');
+    const saveBtn = document.getElementById('saveBtn');
+    const exportHtmlBtn = document.getElementById('exportHtml');
+    const downloadHtmlBtn = document.getElementById('downloadHtml');
+    const exportJsonBtn = document.getElementById('exportJson');
+    const importJsonBtn = document.getElementById('importJson');
+    const importFile = document.getElementById('importFile');
+    const imageInput = document.getElementById('imageInput');
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // exec helper
+    function exec(command, value=null){
+      document.execCommand(command, false, value);
+      editor.focus();
+      updateStats();
+    }
+
+    // Heading helper
+    function applyHeading(tag){
+      if(!tag){ exec('formatBlock', 'P'); return; }
+      exec('formatBlock', tag);
+      document.getElementById('heading').value = '';
+    }
+
+    // Create link
+    function createLink(){
+      const url = prompt('Enter the URL (include http:// or https://):');
+      if(url){
+        exec('createLink', url);
+      }
+    }
+
+    // Image insert
+    imageInput.addEventListener('change', (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt){
+        exec('insertImage', evt.target.result);
+      };
+      reader.readAsDataURL(file);
+      imageInput.value = '';
+    });
+
+    // Stats update
+    function updateStats(){
+      const text = editor.innerText || '';
+      const chars = text.replace(/\r/g,'').length;
+      const words = text.trim().length ? text.trim().split(/\s+/).length : 0;
+      const paras = editor.querySelectorAll('p,div,h1,h2,h3').length || 1;
+      charCount.textContent = chars;
+      wordCount.textContent = words;
+      paraCount.textContent = paras;
+    }
+
+    // Save to localStorage
+    function saveToLS(){
+      const payload = {
+        html: editor.innerHTML,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(LS_KEY, JSON.stringify(payload));
+      lastSaved.textContent = new Date().toLocaleString();
+    }
+
+    // Load from LS
+    function loadFromLS(){
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return;
+      try{
+        const data = JSON.parse(raw);
+        if(data && data.html) editor.innerHTML = data.html;
+        if(data && data.updatedAt) lastSaved.textContent = new Date(data.updatedAt).toLocaleString();
+        updateStats();
+      }catch(err){ console.warn('load failed', err) }
+    }
+
+    // Export HTML as textarea (for copy) or file
+    exportHtmlBtn.addEventListener('click', ()=>{
+      const html = editor.innerHTML;
+      const win = window.open('', '_blank');
+      win.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Exported Document</title></head><body>'+html+'</body></html>');
+      win.document.close();
+    });
+
+    // Download HTML file
+    downloadHtmlBtn.addEventListener('click', ()=>{
+      const html = '<!doctype html><html><head><meta charset="utf-8"><title>Document</title></head><body>'+editor.innerHTML+'</body></html>';
+      const blob = new Blob([html], {type: 'text/html'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'document.html'; a.click();
+    });
+
+    // Export JSON
+    exportJsonBtn.addEventListener('click', ()=>{
+      const data = { html: editor.innerHTML, exportedAt: new Date().toISOString() };
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'rich-notepad-backup.json'; a.click();
+    });
+
+    // Import JSON
+    importJsonBtn.addEventListener('click', ()=> importFile.click());
+    importFile.addEventListener('change', (ev)=>{
+      const file = ev.target.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e){
+        try{
+          const data = JSON.parse(e.target.result);
+          if(data && data.html){
+            if(confirm('Import will replace current content. Continue?')){
+              editor.innerHTML = data.html;
+              updateStats();
+              saveToLS();
+              alert('Imported successfully');
+            }
+          } else alert('Invalid JSON file (missing html).');
+        }catch(err){ alert('Failed to parse JSON'); }
+      };
+      reader.readAsText(file);
+    });
+
+    // Save button
+    saveBtn.addEventListener('click', ()=> { saveToLS(); alert('Saved locally'); });
+
+    // Auto-save every 15s
+    setInterval(()=> { saveToLS(); }, 15000);
+
+    // Editor input events
+    editor.addEventListener('input', ()=> { updateStats(); });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e)=>{
+      // Ctrl/Cmd + S -> save
+      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){
+        e.preventDefault();
+        saveToLS();
+        alert('Saved locally (Ctrl+S)');
+      }
+      // Formatting shortcuts handled by browser (bold/italic/underline)
+    });
+
+    // Load initial content
+    loadFromLS();
+
+    // ensure focus on editor on click anywhere in card
+    document.querySelector('.card').addEventListener('click', (e)=>{
+      if(!editor.contains(e.target)) editor.focus();
+    });
+
+    // helper: debounce updateStats for performance (on resize/content heavy)
+    let _deb;
+    window.addEventListener('resize', ()=> { clearTimeout(_deb); _deb = setTimeout(updateStats,200); });
+
+    // initial stats
+    updateStats();
+
+  </script>
+</body>
+</html>
