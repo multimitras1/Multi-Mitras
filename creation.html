@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Creation Tool — To-Do List Online</title>
+  <meta name="description" content="Create, manage, and track tasks online using this free Task Creation / To-Do List tool. Save tasks, mark complete, search, and export/import notes.">
+  <meta name="keywords" content="task creation, to-do list, online tasks, manage tasks, productivity, online to-do">
+  <meta property="og:title" content="Task Creation Tool — To-Do List Online">
+  <meta property="og:description" content="Free online To-Do List / Task Creation Tool with search, filter, export, and import options. Mobile-friendly and responsive.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yourwebsite.com/task-creation">
+  <meta property="og:image" content="https://yourwebsite.com/task-preview.png">
+
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; background:#f0f4f8; }
+    header { background:#ffa500; padding:15px; text-align:center; font-size:24px; font-weight:bold; color:#000; position:sticky; top:0; z-index:1000;}
+    .ad {text-align:center; margin:10px 0;}
+    .container {max-width:800px; margin:20px auto; padding:0 15px;}
+    .toolbar {display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+    .toolbar input {flex:1; padding:10px; border-radius:6px; border:1px solid #ccc;}
+    .toolbar button {background:#ffa500; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold;}
+    .filters {margin:10px 0; display:flex; gap:10px; flex-wrap:wrap;}
+    .filters button {padding:6px 12px; border:none; border-radius:5px; cursor:pointer; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+    ul {list-style:none; padding:0;}
+    li {background:#fff; margin-bottom:8px; padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 5px rgba(0,0,0,0.08);}
+    li.completed {text-decoration:line-through; opacity:0.6;}
+    li button {background:#ff6b6b; border:none; padding:6px 10px; border-radius:5px; cursor:pointer; color:#fff; font-weight:bold;}
+    footer {text-align:center; background:#222; color:#fff; padding:20px; margin-top:20px;}
+    @media(max-width:600px){.toolbar{flex-direction:column;}.filters{justify-content:center;}}
+  </style>
+</head>
+<body>
+  <header>✅ Task Creation / To-Do List Tool</header>
+
+  <!-- Top Ad -->
+  <div class="ad">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : 'a4236a38fef8b51c08a860f7e29b1a32',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/a4236a38fef8b51c08a860f7e29b1a32/invoke.js"></script>
+  </div>
+
+  <div class="container">
+    <div class="toolbar">
+      <input type="text" id="taskInput" placeholder="Add a new task...">
+      <button onclick="addTask()">Add Task</button>
+      <button onclick="exportTasks()">⬇ Export</button>
+      <button onclick="importTasks()">⬆ Import</button>
+      <input type="file" id="importFile" style="display:none" accept=".json">
+    </div>
+
+    <div class="filters">
+      <button onclick="filterTasks('all')">All</button>
+      <button onclick="filterTasks('pending')">Pending</button>
+      <button onclick="filterTasks('completed')">Completed</button>
+    </div>
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <!-- Middle Ad -->
+  <div class="ad">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '8a02d9520d2faa074d27d1b1582d7bf6',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//lightingshovestature.com/8a02d9520d2faa074d27d1b1582d7bf6/invoke.js"></script>
+  </div>
+
+  <footer>© 2025 Task Creation Tool | All rights reserved.</footer>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    let filter = 'all';
+
+    function saveTasks() {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function renderTasks() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+      tasks.forEach((task,index)=>{
+        if(filter==='completed' && !task.completed) return;
+        if(filter==='pending' && task.completed) return;
+
+        const li = document.createElement("li");
+        li.className = task.completed ? "completed" : "";
+        li.innerHTML = `
+          <span onclick="toggleComplete(${index})">${task.text}</span>
+          <button onclick="deleteTask(${index})">🗑</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const text = input.value.trim();
+      if(text==='') return alert('Please enter a task!');
+      tasks.push({text:text, completed:false});
+      input.value='';
+      saveTasks();
+      renderTasks();
+    }
+
+    function toggleComplete(index) {
+      tasks[index].completed = !tasks[index].completed;
+      saveTasks();
+      renderTasks();
+    }
+
+    function deleteTask(index) {
+      if(confirm("Delete this task?")){
+        tasks.splice(index,1);
+        saveTasks();
+        renderTasks();
+      }
+    }
+
+    function filterTasks(f){
+      filter=f;
+      renderTasks();
+    }
+
+    function exportTasks(){
+      const blob = new Blob([JSON.stringify(tasks,null,2)],{type:"application/json"});
+      const a = document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="tasks-backup.json";
+      a.click();
+    }
+
+    function importTasks(){
+      document.getElementById("importFile").click();
+    }
+
+    document.getElementById("importFile").addEventListener("change",function(){
+      const file=this.files[0];
+      if(file){
+        const reader = new FileReader();
+        reader.onload=function(e){
+          tasks = JSON.parse(e.target.result);
+          saveTasks();
+          renderTasks();
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    renderTasks();
+  </script>
+</body>
+</html>
